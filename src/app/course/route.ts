@@ -20,11 +20,16 @@ export async function GET(request: NextRequest) {
     "</body>",
     `<script>
       document.addEventListener('DOMContentLoaded', function() {
-        var authScreen = document.getElementById('auth-screen');
-        if (authScreen) authScreen.classList.remove('active');
-        var dashboardScreen = document.getElementById('dashboard-screen');
-        if (dashboardScreen) dashboardScreen.classList.add('active');
-        localStorage.setItem('cp_current', 'clerk_user');
+        var username = 'clerk_user';
+        var existing = JSON.parse(localStorage.getItem('cp_users') || '{}');
+        if (!existing[username]) {
+          existing[username] = { name: 'תלמיד', completedUnits: [], xp: 0 };
+          localStorage.setItem('cp_users', JSON.stringify(existing));
+        }
+        localStorage.setItem('cp_current', username);
+        if (typeof loadDashboard === 'function') {
+          loadDashboard(username);
+        }
       });
     </script></body>`
   );
