@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
@@ -10,26 +10,37 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
+  const user = await currentUser();
+  const firstName = user?.firstName || "";
+  const lastName = user?.lastName || "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ") || "תלמיד";
+
   const filePath = path.join(process.cwd(), "content", "course.html");
   let html = fs.readFileSync(filePath, "utf-8");
   html = html.replaceAll("../../assets/", "/assets/");
   html = html.replaceAll("../assets/", "/assets/");
 
-  // Bypass the old built-in auth screen since Clerk handles authentication
   html = html.replace(
     "</body>",
     `<script>
       document.addEventListener('DOMContentLoaded', function() {
         var username = 'clerk_user';
+        var fullName = ${JSON.stringify(fullName)};
         var existing = JSON.parse(localStorage.getItem('cp_users') || '{}');
         if (!existing[username]) {
-          existing[username] = { name: 'תלמיד', completedUnits: [], xp: 0 };
-          localStorage.setItem('cp_users', JSON.stringify(existing));
+          existing[username] = { name: fullName, completedUnits: [], xp: 0 };
+        } else {
+          existing[username].name = fullName;
         }
+        localStorage.setItem('cp_users', JSON.stringify(existing));
         localStorage.setItem('cp_current', username);
         if (typeof loadDashboard === 'function') {
           loadDashboard(username);
         }
+        // Override logout to use Clerk sign-out
+        window.handleLogout = function() {
+          window.location.href = '/sign-out';
+        };
       });
     </script></body>`
   );
