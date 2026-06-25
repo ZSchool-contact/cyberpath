@@ -15,6 +15,18 @@ export async function GET(request: NextRequest) {
   html = html.replaceAll("../../assets/", "/assets/");
   html = html.replaceAll("../assets/", "/assets/");
 
+  // Bypass the old built-in auth screen since Clerk handles authentication
+  html = html.replace(
+    "</body>",
+    `<script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var authScreen = document.getElementById('auth-screen');
+        if (authScreen) authScreen.classList.remove('active');
+        localStorage.setItem('cp_current', 'clerk_user');
+      });
+    </script></body>`
+  );
+
   return new NextResponse(html, {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
