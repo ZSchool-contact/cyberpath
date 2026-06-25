@@ -924,7 +924,8 @@ function renderUnits(completed) {
 }
 
 function openUnit(unit) {
-  window.location.href = unit.file;
+  var match = unit.file.match(/units\/(unit-\d+)\//);
+  if (match) window.location.href = '/units/' + match[1];
 }
 
 // ══════════════════════════════

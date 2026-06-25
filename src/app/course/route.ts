@@ -19,10 +19,6 @@ export async function GET(request: NextRequest) {
   let html = fs.readFileSync(filePath, "utf-8");
   html = html.replaceAll("../../assets/", "/assets/");
   html = html.replaceAll("../assets/", "/assets/");
-  html = html.replace(
-    "function openUnit(unit) {\n  window.location.href = unit.file;\n}",
-    "function openUnit(unit) {\n  var match = unit.file.match(/units\\/(unit-\\d+)\\//); \n  if (match) window.location.href = '/units/' + match[1];\n}"
-  );
 
   html = html.replace(
     "</body>",
