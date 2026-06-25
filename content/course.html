@@ -547,6 +547,130 @@
     color: var(--accent);
   }
   @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── COMPLETION MODAL ── */
+  .completion-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,13,24,0.92);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    backdrop-filter: blur(8px);
+  }
+  .completion-overlay.active { display: flex; }
+
+  .completion-box {
+    background: var(--card);
+    border: 1px solid rgba(0,229,255,0.35);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(0,229,255,0.18), 0 40px 80px rgba(0,0,0,0.6);
+    animation: fadeUp 0.6s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .completion-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--green), var(--accent));
+    background-size: 300% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: -300% 0; } }
+
+  .completion-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounce 1s ease 0.3s both;
+  }
+  @keyframes bounce {
+    0%   { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  .completion-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    letter-spacing: 3px;
+    text-shadow: 0 0 24px rgba(0,229,255,0.6);
+  }
+
+  .completion-subtitle {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.2rem;
+  }
+
+  .completion-text {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  .completion-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1.2rem;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    direction: ltr;
+  }
+  .contact-item:hover {
+    border-color: rgba(0,229,255,0.4);
+    color: var(--accent);
+    box-shadow: 0 0 16px rgba(0,229,255,0.1);
+  }
+
+  .btn-close-completion {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.88rem;
+    padding: 0.65rem 1.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-close-completion:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .completion-box { padding: 2rem 1.5rem; }
+    .completion-title { font-size: 1.1rem; }
+  }
 </style>
 </head>
 <body>
@@ -662,6 +786,32 @@
     </div>
 
   </main>
+</div>
+
+<!-- ════ COMPLETION MODAL ════ -->
+<div id="completion-overlay" class="completion-overlay">
+  <div class="completion-box">
+    <div class="completion-icon">🏆</div>
+    <div class="completion-title">MISSION COMPLETE</div>
+    <div class="completion-subtitle">סיימת את כל יחידות הקורס — כל הכבוד!</div>
+    <div class="completion-text">
+      השלמת את 8 יחידות CyberPath ולמדת את יסודות<br>
+      הסייבר והרשתות מהבסיס ועד לניתוח מקצועי.<br><br>
+      <strong style="color:#fff;">הגיע הזמן לקבל את תעודת הסיום שלך</strong><br>
+      ולשמוע על קורסים מתקדמים — צרו קשר עם Z-School:
+    </div>
+    <div class="completion-contacts">
+      <a class="contact-item" href="https://wa.me/972533000045" target="_blank">
+        💬 &nbsp;WhatsApp: 053-3000045
+      </a>
+      <a class="contact-item" href="mailto:contact@z-school.co.il">
+        ✉️ &nbsp;contact@z-school.co.il
+      </a>
+    </div>
+    <button class="btn-close-completion" onclick="document.getElementById('completion-overlay').classList.remove('active')">
+      חזרה לדף הקורס
+    </button>
+  </div>
 </div>
 
 <script>
@@ -879,6 +1029,13 @@ function loadDashboard(username) {
 
   // render units
   renderUnits(completed);
+
+  // show completion modal when all units are done
+  if (completed.length === UNITS.length) {
+    setTimeout(() => {
+      document.getElementById('completion-overlay').classList.add('active');
+    }, 900);
+  }
 }
 
 function renderUnits(completed) {
