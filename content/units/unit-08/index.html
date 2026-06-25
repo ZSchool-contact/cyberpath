@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>יחידה 8 — הגנה, אתיקה וסיכום</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Heebo:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#040E1C; --bg-mid:#0B2E4F; --glass:rgba(8,28,52,0.55);
+  --accent:#1EC6FF; --accent-hi:#5BE0FF; --accent-str:#00AEEF;
+  --glow:rgba(30,198,255,0.35); --glow-str:rgba(30,198,255,0.6);
+  --text:#FFFFFF; --text-2:#C7D3E0; --text-3:#7F9BB3;
+  --border:rgba(30,198,255,0.14);
+  --green:#00DC78; --red:#FF5050; --yellow:#FFD700; --orange:#FF8C42;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3{font-family:'Rubik',sans-serif;font-weight:900;}
+.bg-image{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(rgba(4,14,28,0.62),rgba(4,14,28,0.62)),
+  url('../../assets/icons/unit-01/cyber-networks-course-background.png') center/cover no-repeat;}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(30,198,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(30,198,255,0.035) 1px,transparent 1px);
+  background-size:48px 48px;}
+.bg-blob{position:fixed;z-index:0;border-radius:50%;filter:blur(90px);pointer-events:none;}
+.bg-blob-1{width:500px;height:500px;top:-160px;left:-100px;background:radial-gradient(circle,rgba(30,198,255,0.09),transparent 70%);}
+.bg-blob-2{width:400px;height:400px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(0,80,160,0.14),transparent 70%);}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh;max-width:680px;margin:0 auto;background:rgba(4,14,28,0.65);}
+.progress-bar{height:3px;background:rgba(30,198,255,0.08);overflow:hidden;flex-shrink:0;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-str),var(--accent-hi));box-shadow:0 0 12px var(--glow-str);transition:width 0.5s cubic-bezier(.4,0,.2,1);}
+.unit-header{padding:11px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(4,14,28,0.7);backdrop-filter:blur(10px);flex-shrink:0;}
+.unit-badge{font-family:'Rubik',sans-serif;font-weight:700;font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--glow-str);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.screen-counter{font-size:12px;color:var(--text-3);}
+.screens{flex:1;overflow:hidden;position:relative;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;padding:20px 20px 8px;overflow-y:auto;opacity:0;pointer-events:none;transform:translateX(-30px);transition:opacity 0.3s ease,transform 0.3s ease;}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.screen.exit{opacity:0;transform:translateX(30px);pointer-events:none;}
+.dots{display:flex;justify-content:center;gap:5px;padding:8px 0 4px;flex-shrink:0;}
+.dot{width:5px;height:5px;border-radius:3px;background:rgba(30,198,255,0.12);transition:all 0.35s cubic-bezier(.4,0,.2,1);cursor:pointer;border:none;}
+.dot.active{width:20px;background:linear-gradient(90deg,var(--accent-str),var(--accent-hi));box-shadow:0 0 10px var(--glow);}
+.nav{padding:6px 20px 20px;display:flex;gap:10px;justify-content:center;align-items:center;flex-shrink:0;}
+.btn{border:none;border-radius:14px;font-family:'Rubik',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.22s ease;}
+.btn-primary{padding:13px 44px;background:linear-gradient(135deg,var(--accent),var(--accent-str));color:#040E1C;border-radius:8px;box-shadow:0 4px 20px rgba(30,198,255,0.3);}
+.btn-primary:hover{box-shadow:0 6px 32px rgba(30,198,255,0.55);transform:translateY(-1px);}
+.btn-back{padding:13px 18px;background:rgba(30,198,255,0.06);color:var(--text-3);border:1px solid rgba(30,198,255,0.15);border-radius:8px;}
+
+/* Atoms */
+.eyebrow{font-family:'Rubik',sans-serif;font-weight:700;font-size:10px;color:var(--accent);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+.card-green{border-color:rgba(0,220,120,0.25);background:rgba(0,220,120,0.04);}
+.card-red{border-color:rgba(255,80,80,0.25);background:rgba(255,80,80,0.04);}
+.card-yellow{border-color:rgba(255,215,0,0.25);background:rgba(255,215,0,0.04);}
+.insight-box{border-radius:12px;padding:13px 16px;border-right:3px solid var(--accent);background:rgba(30,198,255,0.05);font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;}
+.insight-box.green{border-right-color:var(--green);background:rgba(0,220,120,0.05);}
+.insight-box.yellow{border-right-color:var(--yellow);background:rgba(255,215,0,0.05);}
+.insight-box.red{border-right-color:var(--red);background:rgba(255,80,80,0.05);}
+.obj-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.obj-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:14px;background:var(--glass);border:1px solid var(--border);}
+.obj-num{width:30px;height:30px;flex-shrink:0;background:linear-gradient(135deg,rgba(30,198,255,0.2),rgba(0,174,239,0.1));border:1px solid rgba(30,198,255,0.25);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:900;font-size:13px;color:var(--accent);}
+.obj-text{font-size:14px;line-height:1.5;padding-top:4px;color:var(--text-2);}
+
+/* Terminal */
+.term-wrap{background:rgba(4,14,28,0.9);border:1px solid rgba(30,198,255,0.2);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(30,198,255,0.04);border-bottom:1px solid var(--border);}
+.term-dot{width:8px;height:8px;border-radius:50%;}
+.term-body{padding:12px 16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.9;direction:ltr;unicode-bidi:isolate;color:#9FBDD0;}
+.term-cmd{color:var(--green);}
+.term-out{color:var(--text-2);}
+.term-hi{color:var(--accent-hi);}
+.term-warn{color:var(--yellow);}
+.term-comment{color:var(--text-3);font-style:italic;}
+
+/* Step flow */
+.step-flow{display:flex;flex-direction:column;gap:0;margin-bottom:14px;}
+.step-item{display:flex;gap:14px;position:relative;padding-bottom:14px;}
+.step-item:last-child{padding-bottom:0;}
+.step-item:not(:last-child)::before{content:'';position:absolute;right:16px;top:36px;width:2px;height:calc(100% - 22px);background:linear-gradient(var(--border),var(--border));}
+.step-circle{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:900;font-size:14px;border:2px solid;}
+.step-circle.s1{border-color:var(--accent);color:var(--accent);background:rgba(30,198,255,0.08);}
+.step-circle.s2{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,0,0.06);}
+.step-circle.s3{border-color:var(--red);color:var(--red);background:rgba(255,80,80,0.08);}
+.step-content{flex:1;padding-top:6px;}
+.step-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;}
+.step-desc{font-size:14px;color:var(--text-3);line-height:1.5;}
+
+/* Ethics table */
+.ethics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.ethics-cell{border-radius:12px;padding:14px;text-align:center;}
+.ethics-cell.yes{background:rgba(0,220,120,0.06);border:1px solid rgba(0,220,120,0.3);}
+.ethics-cell.no{background:rgba(255,80,80,0.06);border:1px solid rgba(255,80,80,0.3);}
+.ethics-icon{font-size:28px;margin-bottom:8px;}
+.ethics-label{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px;}
+.ethics-cell.yes .ethics-label{color:var(--green);}
+.ethics-cell.no .ethics-label{color:var(--red);}
+.ethics-items{font-size:13px;color:var(--text-3);line-height:1.7;text-align:right;}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0;margin-bottom:14px;}
+.tl-item{display:flex;gap:14px;position:relative;padding-bottom:12px;}
+.tl-item:not(:last-child)::before{content:'';position:absolute;right:17px;top:38px;width:2px;height:calc(100% - 24px);background:linear-gradient(to bottom,var(--red),rgba(255,80,80,0.3));}
+.tl-dot{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid rgba(255,80,80,0.4);background:rgba(255,80,80,0.08);}
+.tl-content{flex:1;padding-top:6px;}
+.tl-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--red);margin-bottom:3px;}
+.tl-desc{font-size:13px;color:var(--text-3);line-height:1.5;}
+
+/* Decision scenario */
+.dec-option{border-radius:12px;padding:13px 16px;margin-bottom:9px;border:1.5px solid var(--border);background:var(--glass);cursor:pointer;font-size:14px;color:var(--text-2);line-height:1.5;transition:all 0.2s;font-family:'Heebo',sans-serif;}
+.dec-option:hover{border-color:rgba(30,198,255,0.4);background:rgba(30,198,255,0.06);}
+.dec-option.chosen-right{border-color:var(--green);background:rgba(0,220,120,0.07);color:var(--green);pointer-events:none;}
+.dec-option.chosen-wrong{border-color:var(--red);background:rgba(255,80,80,0.07);color:var(--red);pointer-events:none;}
+.dec-option.reveal-right{border-color:var(--green);color:var(--green);pointer-events:none;}
+.dec-result{display:none;border-radius:10px;padding:12px 16px;margin-top:2px;font-size:14px;line-height:1.6;}
+.dec-result.show{display:block;animation:fadeUp 0.25s ease;}
+.dec-result.ok{background:rgba(0,220,120,0.07);border:1px solid rgba(0,220,120,0.25);color:var(--text-2);}
+.dec-result.err{background:rgba(255,80,80,0.07);border:1px solid rgba(255,80,80,0.2);color:var(--text-2);}
+
+/* Quiz */
+.mc-block{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.mc-q{font-size:15px;color:var(--text-2);margin-bottom:12px;line-height:1.5;}
+.mc-options{display:flex;flex-direction:column;gap:8px;}
+.mc-opt{background:rgba(30,198,255,0.04);border:1px solid rgba(30,198,255,0.15);border-radius:9px;padding:11px 14px;font-size:14px;color:var(--text-2);cursor:pointer;text-align:right;transition:all 0.2s;font-family:'Heebo',sans-serif;line-height:1.4;}
+.mc-opt:hover{border-color:rgba(30,198,255,0.35);background:rgba(30,198,255,0.08);}
+.mc-opt.correct{border-color:var(--green);background:rgba(0,220,120,0.08);color:var(--green);pointer-events:none;}
+.mc-opt.wrong{border-color:var(--red);background:rgba(255,80,80,0.08);color:var(--red);pointer-events:none;animation:shake 0.3s ease;}
+.mc-opt.reveal{border-color:var(--green);color:var(--green);pointer-events:none;}
+.mc-feedback{font-size:14px;margin-top:8px;line-height:1.5;}
+.mc-feedback.ok{color:var(--green);}
+.mc-feedback.err{color:var(--red);}
+@keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-4px)}70%{transform:translateX(4px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.check-success{text-align:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--green);background:rgba(0,220,120,0.07);border:1px solid rgba(0,220,120,0.25);border-radius:10px;padding:12px;animation:fadeUp 0.3s ease;margin-top:12px;}
+
+/* Final summary */
+.journey-grid{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.journey-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--glass);border:1px solid var(--border);}
+.j-num{font-family:'Rubik',sans-serif;font-weight:900;font-size:11px;color:var(--accent);min-width:22px;}
+.j-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;flex:1;}
+.j-done{font-size:16px;flex-shrink:0;}
+.next-steps{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.ns-card{border-radius:12px;padding:14px 12px;border:1px solid var(--border);background:var(--glass);text-align:center;}
+.ns-icon{font-size:28px;margin-bottom:8px;}
+.ns-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);margin-bottom:4px;}
+.ns-desc{font-size:12px;color:var(--text-3);line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="bg-image"></div>
+<div class="bg-grid"></div>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="app">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="unit-header" style="display:flex;align-items:center;justify-content:space-between;">
+    <img src="../../assets/zschool-logo.png" alt="Z-School" style="height:30px;width:auto;mix-blend-mode:screen;">
+    <span class="unit-badge"><span class="badge-dot"></span>יחידה 8 · סייבר</span>
+    <span class="screen-counter" id="screenCounter">1 / 12</span>
+  </div>
+
+  <div class="screens">
+
+  <!-- S0: HOOK -->
+  <div class="screen active" id="s0">
+    <div class="eyebrow">⚡ Mission 08 — הסיום</div>
+    <h2 style="font-size:clamp(18px,4.5vw,22px);line-height:1.3;margin-bottom:14px;">מצאת פורט 23 פתוח.<br>nmap סיפר לך. עכשיו מה?</h2>
+
+    <div class="step-flow" style="margin-bottom:14px;">
+      <div class="step-item">
+        <div class="step-circle s1">1</div>
+        <div class="step-content">
+          <div class="step-title">יחידות 1–6</div>
+          <div class="step-desc">למדת מה זו רשת, פורטים, ואיך לקרוא כל שורה בפלט</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle s2">7</div>
+        <div class="step-content">
+          <div class="step-title">יחידה 7</div>
+          <div class="step-desc">למדת לזהות מה מסוכן ולתת ציון אבטחה</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle s3">8</div>
+        <div class="step-content">
+          <div class="step-title">יחידה 8 — היום</div>
+          <div class="step-desc">לומדים <strong style="color:var(--text);">לסגור</strong> את הדלתות — ואת הקווים האדומים שאסור לעבור</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box yellow">⚡ בוחן אבטחה שמוצא פרצה ולא יודע לסגור אותה — רק חצי מקצוען. היחידה הזו משלימה את התמונה.</div>
+  </div>
+
+  <!-- S1: HeyGen -->
+  <div class="screen" id="s1">
+    <div class="eyebrow">סרטון מבוא</div>
+    <h2 style="font-size:18px;margin-bottom:12px;">לפני שמתחילים</h2>
+    <iframe src="https://app.heygen.com/embeds/3e4aaff3ce9b4e7abce239d491bc4838" title="HeyGen video player" frameborder="0" allow="encrypted-media; fullscreen;" allowfullscreen style="width:100%;aspect-ratio:16/9;border-radius:14px;border:1px solid var(--border);display:block;margin-bottom:14px;"></iframe>
+  </div>
+
+  <!-- S2: מה נגלה היום -->
+  <div class="screen" id="s2">
+    <div class="eyebrow">מה נגלה היום</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">בסוף היחידה תדעו:</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">שלושה כישורים שמשלימים את ארגז הכלים שלכם</p>
+    <div class="obj-list">
+      <div class="obj-item"><div class="obj-num">1</div><div class="obj-text"><strong style="color:var(--text);">לסגור פורט</strong> — למצוא מי פתח אותו ולכבות אותו בשלושה פקודות: netstat → tasklist → taskkill</div></div>
+      <div class="obj-item"><div class="obj-num">2</div><div class="obj-text"><strong style="color:var(--text);">Firewall</strong> — להבין את ההבדל בין סגירת תוכנה לבין שומר שמחליט מי נכנס</div></div>
+      <div class="obj-item"><div class="obj-num">3</div><div class="obj-text"><strong style="color:var(--text);">הקווים האדומים</strong> — מתי מותר לסרוק, מה קורה כשתופסים, ואיפה מותר לתרגל</div></div>
+    </div>
+  </div>
+
+  <!-- S3: שלב 1 — netstat -->
+  <div class="screen" id="s3">
+    <div class="eyebrow">שלב 1 מתוך 3 — מי פתח את הפורט?</div>
+    <h2 style="font-size:18px;margin-bottom:8px;">netstat — רשימת חיבורים פעילים</h2>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">nmap אמר לנו שפורט 23 פתוח — אבל לא אמר <em>מי</em> פתח אותו. כל פורט פתוח אומר שיש <strong style="color:var(--accent-hi);">תוכנה שרצה ברקע ומחכה לחיבורים</strong> — בשפה המקצועית: היא "מאזינה" (LISTENING) על הפורט הזה.</p>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;">כדי לסגור את הפורט, צריך קודם לגלות מי התוכנה הזו. לכל תוכנה שרצה במחשב יש מספר מזהה ייחודי — <strong style="color:var(--accent-hi);">PID (Process ID)</strong>. כמו תעודת זהות לכל תהליך שרץ ברגע זה.</p>
+
+    <div class="term-wrap">
+      <div class="term-bar">
+        <span class="term-dot" style="background:#FF5F57;"></span>
+        <span class="term-dot" style="background:#FEBC2E;"></span>
+        <span class="term-dot" style="background:#28C840;"></span>
+        <span style="font-size:11px;color:var(--text-3);margin-right:8px;">CMD — הרץ כמנהל</span>
+      </div>
+      <div class="term-body">
+        <span class="term-cmd">C:\&gt; netstat -ano | findstr :23</span><br>
+        <span class="term-out">TCP &nbsp;&nbsp; 0.0.0.0:23 &nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0:0 &nbsp;&nbsp;&nbsp;&nbsp; LISTENING &nbsp;&nbsp;&nbsp; </span><span class="term-hi">4321</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);margin-bottom:10px;">פירוק הפקודה:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);min-width:80px;direction:ltr;">netstat</span>
+          <span style="font-size:13px;color:var(--text-3);">מציג את כל חיבורי הרשת הפעילים</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);min-width:80px;direction:ltr;">-ano</span>
+          <span style="font-size:13px;color:var(--text-3);">הצג הכל במספרים, כולל מספר ה-PID</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);min-width:80px;direction:ltr;">|</span>
+          <span style="font-size:13px;color:var(--text-3);">צינור — שלח את הפלט לפקודה הבאה</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);min-width:80px;direction:ltr;">findstr :23</span>
+          <span style="font-size:13px;color:var(--text-3);">סנן — הצג רק שורות עם פורט 23</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box">💡 <strong style="color:var(--text);">למה חייבים להריץ כמנהל?</strong> Windows מגביל מידע רגיש. משתמש רגיל יקבל רשימה חלקית. מנהל (Administrator) רואה את כל התהליכים, כולל שירותי מערכת ותוכנות ברקע. קליק ימני על CMD ← "הרץ כמנהל" ← אשר.</div>
+    <div class="insight-box green">✅ הספרה <strong style="color:var(--text);">4321</strong> בסוף = PID. המילה LISTENING = התוכנה מחכה לחיבורים נכנסים על פורט 23. זה המספר שנצטרך בשלב הבא.</div>
+  </div>
+
+  <!-- S4: שלב 2 — tasklist -->
+  <div class="screen" id="s4">
+    <div class="eyebrow">שלב 2 מתוך 3 — מי התוכנה?</div>
+    <h2 style="font-size:18px;margin-bottom:8px;">tasklist — חשיפת התוכנה החשודה</h2>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;">יש לנו את ה-PID (4321). עכשיו שואלים את המחשב: <strong style="color:var(--accent-hi);">"מי מחזיק במספר 4321?"</strong></p>
+
+    <div class="term-wrap">
+      <div class="term-bar">
+        <span class="term-dot" style="background:#FF5F57;"></span>
+        <span class="term-dot" style="background:#FEBC2E;"></span>
+        <span class="term-dot" style="background:#28C840;"></span>
+        <span style="font-size:11px;color:var(--text-3);margin-right:8px;">CMD — הרץ כמנהל</span>
+      </div>
+      <div class="term-body">
+        <span class="term-cmd">C:\&gt; tasklist | findstr 4321</span><br>
+        <span class="term-warn">bad-program.exe &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4321 &nbsp; Services &nbsp; 0 &nbsp;&nbsp; 12,420 K</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);margin-bottom:10px;">פירוק הפלט — כל שדה:</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:12px;color:var(--yellow);min-width:130px;direction:ltr;">bad-program.exe</span>
+          <span style="font-size:13px;color:var(--text-3);">שם התוכנה — זה מה שנחפש</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:12px;color:var(--yellow);min-width:130px;direction:ltr;">4321</span>
+          <span style="font-size:13px;color:var(--text-3);">ה-PID שחיפשנו — אישור שזו התוכנה הנכונה</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:12px;color:var(--yellow);min-width:130px;direction:ltr;">Services</span>
+          <span style="font-size:13px;color:var(--text-3);">הקשר שבו רצה (Services = שירות רקע. Console = חלון פתוח)</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:12px;color:var(--yellow);min-width:130px;direction:ltr;">12,420 K</span>
+          <span style="font-size:13px;color:var(--text-3);">כמות זיכרון שהתוכנה תופסת (ב-KB)</span>
+        </div>
+      </div>
+    </div>
+    <div class="card card-red" style="margin-bottom:12px;">
+      <div style="font-size:14px;color:var(--text);line-height:1.6;"><strong style="color:var(--red);">בום.</strong> תפסנו אותה — <span style="font-family:'Courier New',monospace;">bad-program.exe</span><br><br>עכשיו יודעים שם מדויק. <strong style="color:var(--text);">לא מכירים את השם?</strong> חפשו אותו בגוגל — לרוב תגלו מיד אם זו תוכנה לגיטימית או חשודה. בשלב הבא — נסגור אותה.</div>
+    </div>
+
+    <div class="insight-box">💡 שם התוכנה חשוב — לפעמים תגלו שזו תוכנת מערכת לגיטימית של Windows. במקרה כזה <strong style="color:var(--text);">לא</strong> לסגור עם taskkill — אלא להשבית את השירות בצורה מסודרת.</div>
+  </div>
+
+  <!-- S5: שלב 3 — taskkill + סיכום -->
+  <div class="screen" id="s5">
+    <div class="eyebrow">שלב 3 מתוך 3 — סוגרים!</div>
+    <h2 style="font-size:18px;margin-bottom:8px;">taskkill — חיסול התוכנה</h2>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;">יש לנו את שם התוכנה ואת ה-PID שלה. עכשיו נשתמש ב-<strong style="color:var(--accent-hi);">taskkill</strong> — פקודה שסוגרת תהליך בכוח. חשוב: רק על תוכנות שאתם בטוחים שהן לא חלק ממערכת ההפעלה.</p>
+
+    <div class="term-wrap" style="margin-bottom:10px;">
+      <div class="term-bar">
+        <span class="term-dot" style="background:#FF5F57;"></span>
+        <span class="term-dot" style="background:#FEBC2E;"></span>
+        <span class="term-dot" style="background:#28C840;"></span>
+        <span style="font-size:11px;color:var(--text-3);margin-right:8px;">CMD — הרץ כמנהל</span>
+      </div>
+      <div class="term-body">
+        <span class="term-cmd">C:\&gt; taskkill /PID 4321 /F</span><br>
+        <span style="color:var(--green);">SUCCESS: The process with PID 4321 has been terminated.</span><br><br>
+        <span class="term-comment">← הפורט ננעל. nmap לא יראה אותו יותר.</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);margin-bottom:8px;">מה המשמעות של הדגלים:</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);min-width:70px;direction:ltr;">/PID 4321</span>
+          <span style="font-size:13px;color:var(--text-3);">ציין את התוכנה לפי מספר PID — לא לפי שם (כי שמות יכולים לחזור על עצמם)</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);min-width:70px;direction:ltr;">/F</span>
+          <span style="font-size:13px;color:var(--text-3);">Force — כבה בכוח, בלי לשאול "האם אתה בטוח?" ובלי לתת לתוכנה להתנגד</span>
+        </div>
+      </div>
+    </div>
+    <div class="insight-box yellow">⚠️ <strong style="color:var(--text);">זהירות עם /F:</strong> אם תסגרו תוכנת מערכת חיונית בכוח — המחשב עלול לקרוס. תמיד בדקו קודם בגוגל שהתוכנה אינה שייכת ל-Windows.</div>
+
+    <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--text-2);margin-bottom:10px;">סיכום 3 השלבים:</div>
+    <div class="step-flow">
+      <div class="step-item">
+        <div class="step-circle s1">1</div>
+        <div class="step-content">
+          <div class="step-title" style="direction:ltr;font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);">netstat -ano | findstr :[פורט]</div>
+          <div class="step-desc">מוצאים PID של התוכנה שפתחה את הפורט</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle s2">2</div>
+        <div class="step-content">
+          <div class="step-title" style="direction:ltr;font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);">tasklist | findstr [PID]</div>
+          <div class="step-desc">מגלים את שם התוכנה</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle s3">3</div>
+        <div class="step-content">
+          <div class="step-title" style="direction:ltr;font-family:'Courier New',monospace;font-size:13px;color:var(--yellow);">taskkill /PID [PID] /F</div>
+          <div class="step-desc">מחסלים את התוכנה — הפורט נסגר</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6: Firewall -->
+  <div class="screen" id="s6">
+    <div class="eyebrow">שיטה שנייה</div>
+    <h2 style="font-size:18px;margin-bottom:8px;">Firewall — שומר בכניסה</h2>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;">לפעמים אי אפשר לכבות תוכנה — למשל, פורט של משחק רשת שאתם צריכים. אבל אפשר לשים שומר שמחליט <strong style="color:var(--accent-hi);">מי נכנס.</strong></p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="card">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--red);margin-bottom:8px;font-size:13px;">❌ בלי Firewall</div>
+        <div style="font-size:13px;color:var(--text-3);line-height:1.65;">כולם יכולים לדפוק על הדלת. תוקפים מרחוק ינסו להיכנס ללא הפרעה.</div>
+        <div style="font-family:'Courier New',monospace;font-size:11px;color:var(--red);margin-top:8px;direction:ltr;">→ nmap: PORT OPEN</div>
+      </div>
+      <div class="card card-green">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--green);margin-bottom:8px;font-size:13px;">✅ עם Firewall</div>
+        <div style="font-size:13px;color:var(--text-3);line-height:1.65;">השומר מכיר את החברים — כתובות IP מוכרות. זרים — מתעלם לגמרי.</div>
+        <div style="font-family:'Courier New',monospace;font-size:11px;color:var(--yellow);margin-top:8px;direction:ltr;">→ nmap: PORT FILTERED</div>
+      </div>
+    </div>
+
+    <div class="insight-box">🏙️ <strong style="color:var(--text);">בעיר הדיגיטלית:</strong> Firewall = שומר בכניסה למסיבה שבודק תעודות זהות. הדלת קיימת — אבל רק מי שמוכר נכנס. מישהו זר שיסרוק יראה <span style="font-family:'Courier New',monospace;color:var(--yellow);">filtered</span> — ולא ידע מה מסתתר מאחורי הדלת.</div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);margin-bottom:8px;">איך ה-Firewall יודע מי "חבר"?</div>
+      <div style="font-size:14px;color:var(--text-2);line-height:1.7;">
+        ה-Firewall פועל לפי <strong style="color:var(--text);">חוקים (Rules)</strong> שאתם מגדירים. לדוגמה:<br><br>
+        <span style="font-family:'Courier New',monospace;font-size:12px;color:var(--green);direction:ltr;">✓ אפשר כניסה לפורט 22 מ-192.168.1.0/24</span><br>
+        <span style="font-family:'Courier New',monospace;font-size:12px;color:var(--red);direction:ltr;">✗ חסום כל כניסה אחרת לפורט 22</span><br><br>
+        כלומר: רק כתובות מהרשת הפנימית (192.168.x.x) — כלומר המחשבים בבית או במשרד — יוכלו להתחבר. כל שאר העולם יקבל שתיקה מוחלטת.
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);margin-bottom:8px;">כלל: מתי לכבות תוכנה ומתי Firewall?</div>
+      <div style="font-size:14px;color:var(--text-2);line-height:1.7;">
+        <strong style="color:var(--text);">כבה תוכנה</strong> — אם הפורט לא נחוץ בכלל. הדרך הנקייה ביותר.<br>
+        <strong style="color:var(--text);">Firewall</strong> — אם הפורט נחוץ לך, אבל לא לכולם.
+      </div>
+    </div>
+  </div>
+
+  <!-- S7: אתיקה -->
+  <div class="screen" id="s7">
+    <div class="eyebrow">הקווים האדומים</div>
+    <h2 style="font-size:18px;margin-bottom:10px;">מתי מותר לסרוק?</h2>
+
+    <div class="ethics-grid">
+      <div class="ethics-cell yes">
+        <div class="ethics-icon">✅</div>
+        <div class="ethics-label">מותר</div>
+        <div class="ethics-items">
+          הרשת שלך<br>
+          הלפטופ שלך<br>
+          הראוטר שלך בבית<br>
+          קיבלת אישור מהבעלים<br>
+          scanme.nmap.org<br>
+          אתגרי CTF
+        </div>
+      </div>
+      <div class="ethics-cell no">
+        <div class="ethics-icon">❌</div>
+        <div class="ethics-label">אסור</div>
+        <div class="ethics-items">
+          אתרי בתי ספר<br>
+          אתרי עיריות / ממשל<br>
+          חברות / בנקים<br>
+          של חברים בלי אישור<br>
+          כל שרת ציבורי<br>
+          "רק לראות"
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box">💡 <strong style="color:var(--text);">מה זה CTF?</strong> Capture The Flag — תחרויות סייבר מסודרות שבהן מקימים שרתים עם חולשות מכוונות, ומתחרים מוזמנים לפרוץ אותם בחינם וברשות מלאה. זו הדרך שבה אנשי סייבר מקצועיים מתאמנים לגיטימית.</div>
+
+    <div class="card card-red">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--red);margin-bottom:8px;font-size:14px;">⚠ סריקה בלי רשות = עבירה פלילית</div>
+      <div style="font-size:14px;color:var(--text-2);line-height:1.7;">לפי החוק הישראלי — <strong style="color:var(--text);">סריקה בלי אישור</strong> נחשבת כניסיון לחדירה לחומר מחשב שלא כדין. גם אם לא שינית כלום. גם אם "רק בדקת".<br><br><strong style="color:var(--text);">שאלה נפוצה: "מה אם אשתמש ב-VPN?"</strong><br>VPN מסתיר את ה-IP שלכם מהאתר — אבל ספק ה-VPN עצמו רואה הכל ומחויב על פי חוק לשתף מידע עם גורמי החוק. VPN לא מגן עליכם מעבירה פלילית.</div>
+    </div>
+  </div>
+
+  <!-- S8: מה קורה כשתופסים -->
+  <div class="screen" id="s8">
+    <div class="eyebrow">מה קורה בפועל</div>
+    <h2 style="font-size:18px;margin-bottom:10px;">מהסריקה עד לדלת שלכם</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">הנה מה שקורה כשמישהו סורק אתר בלי רשות — שלב אחר שלב</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">🖥️</div>
+        <div class="tl-content">
+          <div class="tl-title">הסריקה מתחילה</div>
+          <div class="tl-desc">nmap שולח אלפי בקשות לאתר. לאדם רגיל — 1-2 בקשות. לnmap — אלפים בשנייה.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">🚨</div>
+        <div class="tl-content">
+          <div class="tl-title">מערכת IDS מקפיצה התרעה</div>
+          <div class="tl-desc"><strong style="color:var(--red);">IDS = Intrusion Detection System</strong> — מערכת זיהוי חדירות. היא יושבת על הרשת ומנטרת תעבורה בזמן אמת. כשהיא מזהה דפוס לא אנושי (אלפי בקשות בשנייה לפורטים שונים), היא מקפיצה התרעה ורושמת את ה-IP שלכם ביומן מיידית.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">📋</div>
+        <div class="tl-content">
+          <div class="tl-title">הלוג נשמר לתמיד</div>
+          <div class="tl-desc">תאריך, שעה, כתובת IP, סוג הסריקה. אי אפשר למחוק עקבות אלה — הם קיימים בשרת שסרקתם.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">👮</div>
+        <div class="tl-content">
+          <div class="tl-title">פנייה למשטרת הסייבר</div>
+          <div class="tl-desc">אם הגוף שנסרק הוא עירייה / בית ספר / גוף ממשלתי — הם מעבירים את הלוגים ישירות למשטרה.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">📡</div>
+        <div class="tl-content">
+          <div class="tl-title">צו בית משפט לספק האינטרנט</div>
+          <div class="tl-desc">המשטרה מוציאה צו — בזק / הוט / פרטנר מחויבים לחשוף מי החזיק את ה-IP באותה שעה.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">🏠</div>
+        <div class="tl-content">
+          <div class="tl-title">חוקרים בדלת</div>
+          <div class="tl-desc">תוך ימים — שם מלא של ההורים, כתובת המגורים, מספר טלפון. שיחה לא נעימה — בדרך הקלה.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S9: תרחיש החלטה — אופק -->
+  <div class="screen" id="s9">
+    <div class="eyebrow">תרחיש החלטה</div>
+    <h2 style="font-size:18px;margin-bottom:8px;">הסיפור של אופק</h2>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:14px;color:var(--text-2);line-height:1.7;">אופק למד להשתמש ב-nmap ביחידה 5. החליט לבדוק את האתר של המורה שלו להיסטוריה — <em>"רק לראות אם יש משהו מעניין."</em> הוא הריץ סריקה קטנה ולא שינה כלום באתר.<br><br>למחרת המנהלת קראה לו לשיחה. חברת האבטחה של האתר זיהתה אותו.</div>
+    </div>
+
+    <div id="dec1">
+      <div style="font-size:15px;color:var(--text);margin-bottom:10px;font-family:'Rubik',sans-serif;font-weight:700;">שאלה 1: האם אופק עשה משהו לא חוקי?</div>
+      <div class="dec-option" onclick="decideDec8(this,1,false)">א. לא — הוא רק סרק ולא שינה כלום</div>
+      <div class="dec-option" onclick="decideDec8(this,1,true)">ב. כן — סריקה בלי רשות היא עבירה, גם בלי לשנות כלום</div>
+      <div class="dec-option" onclick="decideDec8(this,1,false)">ג. תלוי — אם האתר ציבורי, מותר לסרוק</div>
+      <div class="dec-result" id="dec1-res"></div>
+    </div>
+
+    <div id="dec2" style="display:none;margin-top:14px;">
+      <div style="font-size:15px;color:var(--text);margin-bottom:10px;font-family:'Rubik',sans-serif;font-weight:700;">שאלה 2: מה היה אופק צריך לעשות במקום?</div>
+      <div class="dec-option" onclick="decideDec8(this,2,false)">א. לסרוק בשעות הלילה כשפחות מזהים</div>
+      <div class="dec-option" onclick="decideDec8(this,2,true)">ב. להשתמש ב-scanme.nmap.org או להקים מעבדה ב-VirtualBox</div>
+      <div class="dec-option" onclick="decideDec8(this,2,false)">ג. לבקש מהמורה רשות לפני הסריקה</div>
+      <div class="dec-result" id="dec2-res"></div>
+    </div>
+
+    <div id="dec-done" style="display:none;">
+      <div class="card card-green" style="margin-top:10px;">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--green);margin-bottom:6px;">אפשרויות התרגול החוקי:</div>
+        <div style="font-size:14px;color:var(--text-2);line-height:1.7;">🖥️ <strong style="color:var(--text);">VirtualBox</strong> — מערכת הפעלה בתוך המחשב שלך. סורקים אותה כמה שרוצים.<br>🌐 <strong style="color:var(--text);">scanme.nmap.org</strong> — שרת שמיועד לתרגול. תמיד חוקי.<br>🏆 <strong style="color:var(--text);">אתגרי CTF</strong> — תחרויות סייבר לגיטימיות, עם מטרות ייעודיות.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S10: Quiz -->
+  <div class="screen" id="s10">
+    <div class="eyebrow">בוחן אחרון</div>
+    <h2 style="font-size:18px;margin-bottom:14px;">בדקו את עצמכם</h2>
+
+    <div class="mc-block">
+      <div class="mc-q">1. מה זה PID ולמה צריך אותו בסגירת פורט?</div>
+      <div class="mc-options" id="q1o">
+        <div class="mc-opt" onclick="answerQ(1,this,false)">מספר הפורט שרוצים לסגור</div>
+        <div class="mc-opt" onclick="answerQ(1,this,true)">מספר מזהה ייחודי של תוכנה — בלעדיו לא יודעים מה לחסל</div>
+        <div class="mc-opt" onclick="answerQ(1,this,false)">כתובת ה-IP של השרת שסרקנו</div>
+      </div>
+      <div class="mc-feedback" id="fb1"></div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">2. אם nmap מחזיר FILTERED על פורט — מה זה אומר?</div>
+      <div class="mc-options" id="q2o">
+        <div class="mc-opt" onclick="answerQ(2,this,false)">הפורט סגור לחלוטין ואין תוכנה מאחוריו</div>
+        <div class="mc-opt" onclick="answerQ(2,this,true)">יש Firewall שבולע את הבקשה — לא ניתן לדעת מה מאחורי הפורט</div>
+        <div class="mc-opt" onclick="answerQ(2,this,false)">הפורט פתוח אבל מוצפן</div>
+      </div>
+      <div class="mc-feedback" id="fb2"></div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">3. מה ההבדל בין סגירת תוכנה ב-taskkill לבין חסימה ב-Firewall?</div>
+      <div class="mc-options" id="q3o">
+        <div class="mc-opt" onclick="answerQ(3,this,false)">אין הבדל — שניהם עושים את אותו הדבר</div>
+        <div class="mc-opt" onclick="answerQ(3,this,false)">taskkill יותר מסוכן מ-Firewall</div>
+        <div class="mc-opt" onclick="answerQ(3,this,true)">taskkill מכבה תוכנה לחלוטין. Firewall שומר את הפורט פתוח לכתובות מוכרות ומסנן זרים</div>
+      </div>
+      <div class="mc-feedback" id="fb3"></div>
+    </div>
+
+    <div id="quiz-done" style="display:none;">
+      <div class="check-success">✅ סיימתם את הבוחן. מוכנים לסיכום הקורס!</div>
+    </div>
+  </div>
+
+  <!-- S11: סיום הקורס -->
+  <div class="screen" id="s11">
+    <div class="eyebrow" style="color:var(--yellow);">🎓 סיום קורס</div>
+    <h2 style="font-size:22px;margin-bottom:4px;">סיימתם 8 יחידות!</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">הנה המסע שעשיתם — מהתחלה עד הסוף</p>
+
+    <div class="journey-grid">
+      <div class="journey-item"><span class="j-num">01</span><span class="j-title">רשתות מחשבים וכתובות IP</span><span class="j-done">✅</span></div>
+      <div class="journey-item"><span class="j-num">02</span><span class="j-title">TCP, UDP ופורטים</span><span class="j-done">✅</span></div>
+      <div class="journey-item"><span class="j-num">03</span><span class="j-title">פורטים נפוצים ושירותים</span><span class="j-done">✅</span></div>
+      <div class="journey-item"><span class="j-num">04</span><span class="j-title">HTTP ו-curl</span><span class="j-done">✅</span></div>
+      <div class="journey-item"><span class="j-num">05</span><span class="j-title">Nmap — הגשש</span><span class="j-done">✅</span></div>
+      <div class="journey-item"><span class="j-num">06</span><span class="j-title">לקרוא פלט כמו מקצוענים</span><span class="j-done">✅</span></div>
+      <div class="journey-item"><span class="j-num">07</span><span class="j-title">ניתוח תוצאות וסיכונים</span><span class="j-done">✅</span></div>
+      <div class="journey-item" style="border-color:rgba(255,215,0,0.35);background:rgba(255,215,0,0.05);"><span class="j-num" style="color:var(--yellow);">08</span><span class="j-title" style="color:var(--yellow);">הגנה, אתיקה וסיכום</span><span class="j-done">🏆</span></div>
+    </div>
+
+    <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--text-2);margin-bottom:10px;">מה הלאה?</div>
+    <div class="next-steps">
+      <div class="ns-card">
+        <div class="ns-icon">🖥️</div>
+        <div class="ns-title">VirtualBox</div>
+        <div class="ns-desc">הקימו מעבדה ביתית — סרקו כמה שרוצים בבטחה</div>
+      </div>
+      <div class="ns-card">
+        <div class="ns-icon">🌐</div>
+        <div class="ns-title">scanme.nmap.org</div>
+        <div class="ns-desc">שרת תרגול רשמי — תמיד חוקי ומוזמן</div>
+      </div>
+      <div class="ns-card">
+        <div class="ns-icon">🏆</div>
+        <div class="ns-title">CTF</div>
+        <div class="ns-desc">אתגרי סייבר תחרותיים — המקום הטוב ביותר להתחרות</div>
+      </div>
+      <div class="ns-card">
+        <div class="ns-icon">🎓</div>
+        <div class="ns-title">קורס הבא</div>
+        <div class="ns-desc">Kali Linux, Metasploit, Web Hacking — המסע ממשיך</div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /screens -->
+
+  <div class="dots" id="dotNav"></div>
+  <div class="nav">
+    <button class="btn btn-back" id="btnBack" onclick="navigate(-1)" style="display:none;">הקודם →</button>
+    <button class="btn btn-primary" id="btnNext" onclick="navigate(1)">← הבא</button>
+  </div>
+</div>
+
+<script>
+var scormAPI=null;
+function findAPI(w){var t=0;while(!w.API&&w.parent&&w.parent!==w&&t<7){w=w.parent;t++;}return w.API||null;}
+try{scormAPI=findAPI(window);}catch(e){}
+function scormSet(k,v){try{if(scormAPI)scormAPI.LMSSetValue(k,v);}catch(e){}}
+function scormInit(){try{if(scormAPI){scormAPI.LMSInitialize('');scormSet('cmi.core.lesson_status','incomplete');}}catch(e){}}
+function scormComplete(){try{if(scormAPI){scormSet('cmi.core.lesson_status','completed');scormSet('cmi.core.score.raw','100');scormAPI.LMSCommit('');scormAPI.LMSFinish('');}}catch(e){}}
+scormInit();
+
+var UNIT_ID=8, UNIT_XP=200;
+function completeAndReturn(){
+  scormComplete();
+  try{
+    var u=localStorage.getItem('cp_current');
+    if(u){
+      var users=JSON.parse(localStorage.getItem('cp_users')||'{}');
+      var d=users[u];
+      if(d&&!d.completedUnits.includes(UNIT_ID)){
+        d.completedUnits.push(UNIT_ID);
+        d.xp=(d.xp||0)+UNIT_XP;
+        localStorage.setItem('cp_users',JSON.stringify(users));
+      }
+    }
+  }catch(e){}
+  window.location.href='../../index.html';
+}
+
+var TOTAL=12,current=0;
+var pFill=document.getElementById('progressFill');
+var btnBack=document.getElementById('btnBack');
+var btnNext=document.getElementById('btnNext');
+var counter=document.getElementById('screenCounter');
+
+function buildDots(){
+  var nav=document.getElementById('dotNav');
+  for(var i=0;i<TOTAL;i++){
+    var d=document.createElement('button');
+    d.className='dot'+(i===0?' active':'');
+    (function(idx){d.onclick=function(){goToScreen(idx);};})(i);
+    nav.appendChild(d);
+  }
+}
+function updateNav(){
+  btnBack.style.display=current===0?'none':'block';
+  btnNext.textContent=current===TOTAL-1?'סיום הקורס 🏆':'← הבא';
+  pFill.style.width=((current+1)/TOTAL*100)+'%';
+  counter.textContent=(current+1)+' / '+TOTAL;
+  document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===current);});
+}
+function goToScreen(n){
+  if(n<0||n>=TOTAL||n===current)return;
+  var prev=document.getElementById('s'+current);
+  var nxt=document.getElementById('s'+n);
+  prev.classList.add('exit');prev.classList.remove('active');
+  setTimeout(function(){prev.classList.remove('exit');nxt.classList.add('active');current=n;updateNav();},220);
+}
+function navigate(dir){
+  if(dir===1&&current===TOTAL-1){completeAndReturn();return;}
+  goToScreen(current+dir);
+}
+buildDots();
+updateNav();
+
+// Decision scenario
+var dec1Done=false, dec2Done=false;
+function decideDec8(btn,q,isRight){
+  if(q===1&&dec1Done)return;
+  if(q===2&&dec2Done)return;
+  var container=document.getElementById('dec'+q);
+  var opts=Array.from(container.querySelectorAll('.dec-option'));
+  opts.forEach(function(o){o.style.pointerEvents='none';});
+  var res=document.getElementById('dec'+q+'-res');
+  if(isRight){
+    btn.classList.add('chosen-right');
+    res.className='dec-result ok show';
+    if(q===1){
+      res.innerHTML='✅ <strong style="color:var(--green)">נכון.</strong> גם סריקה בלי שינוי היא חדירה לחומר מחשב שלא כדין. אופק ראה פורטים של מחשב שלא שייך לו — וזה מספיק.';
+      dec1Done=true;
+      setTimeout(function(){document.getElementById('dec2').style.display='block';},600);
+    } else {
+      res.innerHTML='✅ <strong style="color:var(--green)">בדיוק.</strong> scanme.nmap.org ו-VirtualBox מיועדים לזה בדיוק — ניסוי חופשי, ללא סיכון, ללא עבירה על החוק.';
+      dec2Done=true;
+      setTimeout(function(){document.getElementById('dec-done').style.display='block';},600);
+    }
+  } else {
+    btn.classList.add('chosen-wrong');
+    opts.forEach(function(o,i){
+      var correctIdx=q===1?1:1;
+      if(i===correctIdx)o.classList.add('reveal-right');
+    });
+    res.className='dec-result err show';
+    if(q===1){
+      res.innerHTML='✗ זו טעות נפוצה. "רק סרקתי" — לא פוטר מאחריות משפטית. המחשב שמולך רשם את ה-IP שלך ברגע שהחיבור נוצר.';
+      dec1Done=true;
+      setTimeout(function(){document.getElementById('dec2').style.display='block';},800);
+    } else {
+      res.innerHTML='✗ לבקש רשות מהמורה — זה בכיוון, אבל עדיין לא מספיק (צריך אישור רשמי של בעל השרת). הפתרון הקל: scanme.nmap.org ו-VirtualBox.';
+      dec2Done=true;
+      setTimeout(function(){document.getElementById('dec-done').style.display='block';},800);
+    }
+  }
+}
+
+// Quiz
+var done={1:false,2:false,3:false};
+var correctIdx={1:1,2:1,3:2};
+function answerQ(q,btn,isCorrect){
+  if(done[q])return;
+  done[q]=true;
+  var opts=Array.from(document.getElementById('q'+q+'o').querySelectorAll('.mc-opt'));
+  opts.forEach(function(o){o.style.pointerEvents='none';});
+  var fb=document.getElementById('fb'+q);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='mc-feedback ok';
+    fb.innerHTML={
+      1:'✓ נכון! PID = Process ID. בלעדיו לא יודעים מה לחסל — אולי נסגור תוכנת מערכת חיונית.',
+      2:'✓ בדיוק! Firewall בולע את הבקשה בלי לענות. nmap מפרש שתיקה = filtered.',
+      3:'✓ נכון! taskkill = כיבוי מוחלט. Firewall = שומר שמסנן — הפורט עצמו נשאר פתוח לכתובות מורשות.'
+    }[q];
+  } else {
+    btn.classList.add('wrong');
+    opts[correctIdx[q]].classList.add('reveal');
+    fb.className='mc-feedback err';
+    fb.innerHTML={
+      1:'✗ PID = Process Identifier — מספר ייחודי לכל תהליך שרץ. בלעדיו לא נדע איזו תוכנה לסגור.',
+      2:'✗ filtered לא אומר סגור. אומר שיש firewall שלא עונה. מה מאחוריו — לא ידוע.',
+      3:'✗ taskkill מכבה את התוכנה לחלוטין. Firewall לא נוגע בתוכנה — רק מחליט מי רשאי לתקשר איתה.'
+    }[q];
+  }
+  if(done[1]&&done[2]&&done[3]){
+    document.getElementById('quiz-done').style.display='block';
+    scormComplete();
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="1.7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 7L50 14V29C50 42 42 52 32 58C22 52 14 42 14 29V14L32 7Z"/>
+    <path d="M18 22L22 20L26 22L30 20L34 22L38 20L42 22L46 20" stroke-width="1" opacity="0.75"/>
+    <path d="M26 28H38V36H44"/>
+    <path d="M32 28V21H40"/>
+    <path d="M26 36V43H34V49"/>
+    <path d="M38 36V44H45" stroke-width="1"/>
+    <path d="M20 15L24 17M44 17L48 15M17 36L21 34M43 50L47 47" stroke-width="1" opacity="0.55"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="26" cy="28" r="2" fill="#00ff9d"/>
+    <circle cx="40" cy="21" r="2" fill="#00ff9d"/>
+    <circle cx="45" cy="44" r="2" fill="#00ff9d"/>
+    <circle cx="34" cy="49" r="1.7" fill="#00e5ff"/>
+  </g>
+</svg>
+

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>יחידה 6 — לקרוא פלט כמו מקצוענים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Heebo:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#040E1C; --bg-mid:#0B2E4F; --glass:rgba(8,28,52,0.55);
+  --accent:#1EC6FF; --accent-hi:#5BE0FF; --accent-str:#00AEEF;
+  --glow:rgba(30,198,255,0.35); --glow-str:rgba(30,198,255,0.6);
+  --text:#FFFFFF; --text-2:#C7D3E0; --text-3:#7F9BB3;
+  --border:rgba(30,198,255,0.14);
+  --green:#00DC78; --red:#FF5050; --yellow:#FFD700; --orange:#FF8C42;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3{font-family:'Rubik',sans-serif;font-weight:900;}
+.bg-image{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(rgba(4,14,28,0.62),rgba(4,14,28,0.62)),
+  url('../../../../assets/icons/unit-01/cyber-networks-course-background.png') center/cover no-repeat;}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(30,198,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(30,198,255,0.035) 1px,transparent 1px);
+  background-size:48px 48px;}
+.bg-blob{position:fixed;z-index:0;border-radius:50%;filter:blur(90px);pointer-events:none;}
+.bg-blob-1{width:500px;height:500px;top:-160px;left:-100px;background:radial-gradient(circle,rgba(30,198,255,0.09),transparent 70%);}
+.bg-blob-2{width:400px;height:400px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(0,80,160,0.14),transparent 70%);}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh;max-width:680px;margin:0 auto;background:rgba(4,14,28,0.65);}
+.progress-bar{height:3px;background:rgba(30,198,255,0.08);overflow:hidden;flex-shrink:0;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-str),var(--accent-hi));box-shadow:0 0 12px var(--glow-str);transition:width 0.5s cubic-bezier(.4,0,.2,1);position:relative;}
+.progress-fill::after{content:'';position:absolute;top:0;right:0;width:40px;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4));animation:shimmer 2s linear infinite;}
+@keyframes shimmer{0%{transform:translateX(40px);opacity:0}50%{opacity:1}100%{transform:translateX(-200px);opacity:0}}
+.unit-header{padding:11px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(4,14,28,0.7);backdrop-filter:blur(10px);flex-shrink:0;}
+.unit-badge{font-family:'Rubik',sans-serif;font-weight:700;font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--glow-str);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.screen-counter{font-size:14px;color:var(--text-3);}
+.screens{flex:1;overflow:hidden;position:relative;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;padding:20px 20px 8px;overflow-y:auto;opacity:0;pointer-events:none;transform:translateX(-30px);transition:opacity 0.3s ease,transform 0.3s ease;}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.screen.exit{opacity:0;transform:translateX(30px);pointer-events:none;}
+.dots{display:flex;justify-content:center;gap:5px;padding:8px 0 4px;flex-shrink:0;}
+.dot{width:5px;height:5px;border-radius:3px;background:rgba(30,198,255,0.12);transition:all 0.35s cubic-bezier(.4,0,.2,1);cursor:pointer;border:none;}
+.dot.active{width:20px;background:linear-gradient(90deg,var(--accent-str),var(--accent-hi));box-shadow:0 0 10px var(--glow);}
+.nav{padding:6px 20px 20px;display:flex;gap:10px;justify-content:center;align-items:center;flex-shrink:0;}
+.btn{border:none;border-radius:14px;font-family:'Rubik',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.22s ease;}
+.btn-primary{padding:13px 44px;background:linear-gradient(135deg,var(--accent),var(--accent-str));color:#040E1C;border-radius:8px;box-shadow:0 4px 20px rgba(30,198,255,0.3);}
+.btn-primary:hover{box-shadow:0 6px 32px rgba(30,198,255,0.55);transform:translateY(-1px);}
+.btn-back{padding:13px 18px;background:rgba(30,198,255,0.06);color:var(--text-3);border:1px solid rgba(30,198,255,0.15);border-radius:8px;}
+.btn-back:hover{color:var(--text-2);background:rgba(30,198,255,0.1);}
+.eyebrow{font-family:'Rubik',sans-serif;font-weight:700;font-size:10px;color:var(--accent);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;}
+.gap{margin-bottom:12px;}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+.card-green{border-color:rgba(0,220,120,0.25);background:rgba(0,220,120,0.04);}
+.card-red{border-color:rgba(255,80,80,0.25);background:rgba(255,80,80,0.04);}
+.card-yellow{border-color:rgba(255,215,0,0.25);background:rgba(255,215,0,0.04);}
+.insight-box{border-radius:12px;padding:13px 16px;border-right:3px solid var(--accent);background:rgba(30,198,255,0.05);font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;}
+.insight-box.green{border-right-color:var(--green);background:rgba(0,220,120,0.05);}
+.insight-box.yellow{border-right-color:var(--yellow);background:rgba(255,215,0,0.05);}
+.insight-box.red{border-right-color:var(--red);background:rgba(255,80,80,0.05);}
+.obj-list{display:flex;flex-direction:column;gap:10px;}
+.obj-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:14px;background:var(--glass);border:1px solid var(--border);}
+.obj-num{width:30px;height:30px;flex-shrink:0;background:linear-gradient(135deg,rgba(30,198,255,0.2),rgba(0,174,239,0.1));border:1px solid rgba(30,198,255,0.25);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:900;font-size:13px;color:var(--accent);}
+.obj-text{font-size:14px;line-height:1.45;padding-top:4px;}
+.ann-wrap{background:rgba(4,14,28,0.85);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.ann-line{font-family:'Courier New',monospace;font-size:13px;padding:7px 14px;line-height:1.8;cursor:pointer;transition:background 0.15s;display:block;direction:ltr;unicode-bidi:isolate;color:var(--text-3);}
+.ann-line.hl{border-right:3px solid var(--accent);background:rgba(30,198,255,0.05);color:var(--accent-hi);}
+.ann-line.hl-green{border-right:3px solid var(--green);background:rgba(0,220,120,0.04);color:var(--green);}
+.ann-line.hl-red{border-right:3px solid var(--red);background:rgba(255,80,80,0.04);color:var(--red);}
+.ann-line.hl-yellow{border-right:3px solid var(--yellow);background:rgba(255,215,0,0.04);color:var(--yellow);}
+.ann-line:hover{background:rgba(30,198,255,0.06);}
+.ann-pop{display:none;font-size:14px;color:var(--text-2);background:rgba(8,28,52,0.95);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin:0 12px 6px;line-height:1.6;animation:fadeUp 0.2s ease;direction:rtl;unicode-bidi:isolate;font-family:'Heebo',sans-serif;}
+.ann-pop.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sim-wrap{background:rgba(4,14,28,0.9);border:1px solid rgba(30,198,255,0.2);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.sim-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(30,198,255,0.04);border-bottom:1px solid var(--border);}
+.sim-dot{width:8px;height:8px;border-radius:50%;}
+.sim-output{padding:10px 14px;min-height:140px;max-height:220px;overflow-y:auto;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;direction:ltr;unicode-bidi:isolate;white-space:pre-wrap;color:#9FBDD0;}
+.sim-output .ok{color:var(--green);}
+.sim-output .warn{color:var(--yellow);}
+.sim-output .err{color:var(--red);}
+.sim-output .hi{color:var(--accent-hi);}
+.sim-input-row{display:flex;align-items:center;gap:6px;padding:8px 14px;border-top:1px solid var(--border);background:rgba(4,14,28,0.5);direction:ltr;}
+.sim-input{flex:1;background:transparent;border:none;outline:none;font-family:'Courier New',monospace;font-size:13px;color:var(--text);caret-color:var(--accent);}
+.sim-input::placeholder{color:rgba(127,155,179,0.5);}
+.hint-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.hint-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(30,198,255,0.2);background:rgba(30,198,255,0.05);color:var(--accent);font-family:'Heebo',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;}
+.hint-btn:hover{background:rgba(30,198,255,0.12);border-color:rgba(30,198,255,0.4);}
+.mc-block{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.mc-q{font-size:14px;color:var(--text-2);margin-bottom:12px;line-height:1.4;}
+.mc-options{display:flex;flex-direction:column;gap:7px;}
+.mc-opt{background:rgba(30,198,255,0.04);border:1px solid rgba(30,198,255,0.15);border-radius:9px;padding:10px 14px;font-size:14px;color:var(--text-2);cursor:pointer;text-align:right;transition:all 0.2s;font-family:'Heebo',sans-serif;}
+.mc-opt:hover{border-color:rgba(30,198,255,0.35);background:rgba(30,198,255,0.08);}
+.mc-opt.correct{border-color:var(--green);background:rgba(0,220,120,0.08);color:var(--green);pointer-events:none;}
+.mc-opt.wrong{border-color:var(--red);background:rgba(255,80,80,0.08);color:var(--red);pointer-events:none;animation:shake 0.3s ease;}
+.mc-opt.reveal{border-color:var(--green);color:var(--green);pointer-events:none;}
+.mc-feedback{font-size:14px;margin-top:8px;line-height:1.45;}
+.mc-feedback.ok{color:var(--green);}
+.mc-feedback.err{color:var(--red);}
+@keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-4px)}70%{transform:translateX(4px)}}
+.check-success{text-align:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--green);background:rgba(0,220,120,0.07);border:1px solid rgba(0,220,120,0.25);border-radius:10px;padding:12px;animation:fadeUp 0.3s ease;margin-top:12px;}
+.summary-points{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.summary-point{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--glass);border:1px solid var(--border);border-radius:13px;}
+.sp-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;color:var(--green);}
+.sp-text{font-size:14px;color:var(--text-2);line-height:1.45;}
+.sp-text strong{color:var(--text);font-family:'Rubik',sans-serif;}
+.next-card{border-radius:14px;border:1px solid rgba(30,198,255,0.25);background:linear-gradient(135deg,rgba(30,198,255,0.06),rgba(0,174,239,0.02));padding:16px;display:flex;align-items:center;gap:14px;margin-top:4px;}
+.next-icon{flex-shrink:0;width:40px;height:40px;border-radius:10px;background:rgba(30,198,255,0.1);border:1px solid rgba(30,198,255,0.2);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.next-label{font-family:'Rubik',sans-serif;font-weight:700;font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.next-text{font-size:14px;color:var(--text-2);line-height:1.4;}
+
+/* Building visual */
+.building-wrap{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.b-floor{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--glass);position:relative;cursor:default;transition:border-color 0.2s;}
+.b-floor.safe{border-color:rgba(0,220,120,0.3);background:rgba(0,220,120,0.04);}
+.b-floor.warn{border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.04);}
+.b-floor.danger{border-color:rgba(255,80,80,0.3);background:rgba(255,80,80,0.04);}
+.b-port{font-family:'Courier New',monospace;font-weight:700;font-size:13px;min-width:44px;direction:ltr;}
+.b-floor.safe .b-port{color:var(--green);}
+.b-floor.warn .b-port{color:var(--yellow);}
+.b-floor.danger .b-port{color:var(--red);}
+.b-name{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;min-width:70px;}
+.b-desc{font-size:14px;color:var(--text-3);line-height:1.5;}
+.b-icon{font-size:16px;margin-right:auto;flex-shrink:0;}
+
+/* Port story cards */
+.story-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s;}
+.story-card:hover{border-color:rgba(30,198,255,0.3);}
+.story-header{display:flex;align-items:center;gap:10px;margin-bottom:0;}
+.story-ports{font-family:'Courier New',monospace;font-weight:700;font-size:16px;color:var(--accent-hi);direction:ltr;min-width:80px;}
+.story-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;}
+.story-body{display:none;margin-top:10px;font-size:15px;color:var(--text-2);line-height:1.65;border-top:1px solid var(--border);padding-top:10px;}
+.story-body.open{display:block;animation:fadeUp 0.2s ease;}
+.story-hook{font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--accent);margin-top:8px;}
+
+/* Flag decoder */
+.flag-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.flag-card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all 0.2s;}
+.flag-card:hover{border-color:rgba(30,198,255,0.35);}
+.flag-code{font-family:'Courier New',monospace;font-size:18px;color:var(--yellow);direction:ltr;margin-bottom:6px;font-weight:700;}
+.flag-code .flag-letter{color:var(--accent-hi);}
+.flag-explain{display:none;font-size:14px;color:var(--text-2);line-height:1.5;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;}
+.flag-explain.open{display:block;animation:fadeUp 0.2s ease;}
+.flag-meaning{font-family:'Rubik',sans-serif;font-size:14px;color:var(--text-3);margin-bottom:3px;}
+
+/* Output decoder columns */
+.col-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-family:'Courier New',monospace;font-size:13px;direction:ltr;}
+.col-table th{background:rgba(30,198,255,0.08);color:var(--accent);padding:8px 10px;text-align:left;border:1px solid var(--border);font-family:'Rubik',sans-serif;font-size:11px;letter-spacing:1px;}
+.col-table td{padding:8px 10px;border:1px solid var(--border);color:var(--text-2);vertical-align:top;}
+.col-table tr:hover td{background:rgba(30,198,255,0.04);}
+.col-he{font-family:'Heebo',sans-serif;font-size:13px;direction:rtl;unicode-bidi:isolate;}
+
+/* Latency visual */
+.latency-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--glass);margin-bottom:8px;}
+.lat-val{font-family:'Courier New',monospace;font-size:14px;font-weight:700;min-width:90px;direction:ltr;}
+.lat-bar{flex:1;height:8px;border-radius:4px;background:rgba(30,198,255,0.1);overflow:hidden;}
+.lat-fill{height:100%;border-radius:4px;}
+.lat-label{font-size:14px;color:var(--text-3);min-width:90px;text-align:right;}
+</style>
+</head>
+<body>
+
+<div class="bg-image"></div>
+<div class="bg-grid"></div>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="app">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="unit-header" style="display:flex;align-items:center;justify-content:space-between;">
+    <img src="../../assets/zschool-logo.png" alt="Z-School" style="height:30px;width:auto;mix-blend-mode:screen;">
+    <span class="unit-badge"><span class="badge-dot"></span>יחידה 6 · סייבר</span>
+    <span class="screen-counter" id="screenCounter">1 / 12</span>
+  </div>
+
+  <div class="screens">
+
+  <!-- S0: HOOK -->
+  <div class="screen active" id="s0">
+    <div class="eyebrow">⚡ Mission 06</div>
+    <h2 style="font-size:clamp(18px,4.5vw,26px);line-height:1.25;margin-bottom:14px;">הנה פלט סריקה אמיתי.<br>כמה ממנו ברור לכם?</h2>
+    <div class="ann-wrap" style="margin-bottom:14px;">
+      <span class="ann-line" style="color:var(--text-3);">Nmap scan report for office-srv.local (192.168.1.50)</span>
+      <span class="ann-line" style="color:var(--text-3);">Host is up (0.00089s latency).</span>
+      <span class="ann-line" style="color:var(--text-3);">Not shown: 997 closed tcp ports</span>
+      <span class="ann-line" style="color:var(--text-3);">PORT     STATE    SERVICE   VERSION</span>
+      <span class="ann-line" style="color:var(--green);">22/tcp   open     ssh       OpenSSH 8.9p1</span>
+      <span class="ann-line" style="color:var(--green);">80/tcp   open     http      Apache httpd 2.4.54</span>
+      <span class="ann-line" style="color:var(--yellow);">23/tcp   open     telnet</span>
+      <span class="ann-line" style="color:var(--red);">3306/tcp open     mysql     MySQL 5.7.38</span>
+    </div>
+    <div id="hook-q" style="text-align:center;">
+      <button class="btn btn-primary" onclick="revealHook()" style="font-size:14px;padding:11px 28px;">מה אני אמור להבין מכאן?</button>
+    </div>
+    <div id="hook-a" style="display:none;">
+      <div class="insight-box green">✅ <strong style="color:var(--text);">בסוף היחידה הזו</strong> — תדעו לפרוק כל שורה בפלט הזה. שם המחשב, מרחקו, כמה פורטים נבדקו, מה ההבדל בין SERVICE ל-VERSION, ומה מסוכן כאן ולמה.</div>
+    </div>
+  </div>
+
+  <!-- S1: HeyGen -->
+  <div class="screen" id="s1">
+    <div class="eyebrow">סרטון מבוא</div>
+    <h2 style="font-size:18px;margin-bottom:12px;">לפני שמתחילים</h2>
+    <iframe src="https://app.heygen.com/embeds/c48c1ecd8e5942768210def4226729d1" title="HeyGen video player" frameborder="0" allow="encrypted-media; fullscreen;" allowfullscreen style="width:100%;aspect-ratio:16/9;border-radius:14px;border:1px solid var(--border);display:block;margin-bottom:14px;"></iframe>
+  </div>
+
+  <!-- S2: הבניין הדיגיטלי -->
+  <div class="screen" id="s2">
+    <div class="eyebrow">מפת הזיכרון</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">פורטים = קומות בבניין</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">כל פורט הוא דלת בבניין. הצבע מראה עד כמה הדלת הזו מסוכנת כשפתוחה.</p>
+
+    <div class="building-wrap">
+      <div class="b-floor danger">
+        <span class="b-port">3306</span>
+        <span class="b-name">MySQL</span>
+        <span class="b-desc">כספת במרתף — <strong style="color:var(--red);">אסור לרחוב!</strong> מסד נתונים שנגיש מבחוץ = פרצה חמורה</span>
+        <span class="b-icon">🔴</span>
+      </div>
+      <div class="b-floor warn">
+        <span class="b-port">8080</span>
+        <span class="b-name">HTTP-Alt</span>
+        <span class="b-desc">כניסת צוות / ניהול — 8080 = 80+80, כשפורט 80 תפוס. לרוב מציג ממשקי ניהול</span>
+        <span class="b-icon">🟡</span>
+      </div>
+      <div class="b-floor safe">
+        <span class="b-port">443</span>
+        <span class="b-name">HTTPS</span>
+        <span class="b-desc">כניסה ראשית עם מנעול 🔒 — כמו 80 אבל מוצפן. ה-S = Secure</span>
+        <span class="b-icon">🟢</span>
+      </div>
+      <div class="b-floor safe">
+        <span class="b-port">80</span>
+        <span class="b-name">HTTP</span>
+        <span class="b-desc">כניסה ראשית — כל אחד יכול להיכנס. אתר ללא הצפנה</span>
+        <span class="b-icon">🟢</span>
+      </div>
+      <div class="b-floor danger">
+        <span class="b-port">23</span>
+        <span class="b-name">Telnet</span>
+        <span class="b-desc">דלת ישנה בלי מנעול ⚠️ — גישה מרחוק בלי הצפנה. סיסמאות עוברות בטקסט גלוי</span>
+        <span class="b-icon">🔴</span>
+      </div>
+      <div class="b-floor safe">
+        <span class="b-port">22</span>
+        <span class="b-name">SSH</span>
+        <span class="b-desc">דלת אחורית עם מפתח 🔑 — גישה מרחוק מאובטחת למנהלים</span>
+        <span class="b-icon">🟢</span>
+      </div>
+      <div class="b-floor warn">
+        <span class="b-port">21</span>
+        <span class="b-name">FTP</span>
+        <span class="b-desc">חדר משלוחים 📦 — העברת קבצים. לא מוצפן, כדאי להימנע</span>
+        <span class="b-icon">🟡</span>
+      </div>
+    </div>
+    <div class="insight-box" style="font-size:14px;">💡 <strong style="color:var(--text);">כלל אצבע:</strong> דלתות שמנהלים צריכים (22, 3306) צריכות להיות פתוחות <em>רק</em> לכתובות ספציפיות — לא לכל העולם.</div>
+  </div>
+
+  <!-- S3: סיפורי הפורטים -->
+  <div class="screen" id="s3">
+    <div class="eyebrow">למה המספרים האלה?</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">הסיפורים מאחורי המספרים</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">לחצו על כל כרטיס לסיפור שיגרום לכם לזכור</p>
+
+    <div class="story-card" onclick="toggleStory(this)">
+      <div class="story-header">
+        <span class="story-ports">22 ← 23</span>
+        <div>
+          <div class="story-title">SSH "דחף" את Telnet</div>
+          <div style="font-size:14px;color:var(--text-3);">למה SSH קיבל את המספר 22 בדיוק?</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="story-body">
+        ב-1969 Telnet קיבל את פורט 23. הוא שלט בגישה מרחוק במשך 26 שנה.<br><br>
+        ב-1995 Tatu Ylönen המציא SSH כדי <strong style="color:var(--accent-hi);">להחליף</strong> את Telnet — כי Telnet מעביר הכל בטקסט גלוי, כולל סיסמאות.<br><br>
+        הוא בחר פורט 22 במכוון: ממש לפני 23. "SSH באה לדחוף את Telnet החוצה."
+        <div class="story-hook">וו זיכרון: 22 ← 23. החדש יושב ממש לפני הישן.</div>
+      </div>
+    </div>
+
+    <div class="story-card" onclick="toggleStory(this)">
+      <div class="story-header">
+        <span class="story-ports">8080</span>
+        <div>
+          <div class="story-title">8080 = 80 + 80</div>
+          <div style="font-size:14px;color:var(--text-3);">למה לא פשוט 81 או 82?</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="story-body">
+        כשפורט 80 תפוס (למשל, שרת HTTP כבר רץ שם), מפתחים צריכים פורט חלופי לשרת נוסף או ממשק ניהול.<br><br>
+        8080 נבחר כי זה ממש "80 כפול" — קל לזכור שזה <strong style="color:var(--accent-hi);">גרסה שנייה של 80</strong>. מפתחים ראו את זה כבדיחה פנימית שהפכה לקונבנציה.
+        <div class="story-hook">וו זיכרון: 8080 = הכפלת 80. אח קטן של הכניסה הראשית.</div>
+      </div>
+    </div>
+
+    <div class="story-card" onclick="toggleStory(this)">
+      <div class="story-header">
+        <span class="story-ports">443</span>
+        <div>
+          <div class="story-title">HTTP + מנעול = 443</div>
+          <div style="font-size:14px;color:var(--text-3);">למה לא 81 לאתר מאובטח?</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="story-body">
+        כש-HTTPS נוצר ב-1994, 80 כבר שייך ל-HTTP. צריך פורט חדש לחלוטין — לא 81 (שנראה כמו שגיאה של 80).<br><br>
+        443 נבחר כמספר זמין שרחוק מספיק מ-80 כדי להיות ברור שזה <strong style="color:var(--accent-hi);">שירות שונה לגמרי</strong>. ה-S ב-HTTPS = Secure.
+        <div class="story-hook">וו זיכרון: 443 = 80 עם שכבת אבטחה. יש לו S — יש לו מנעול.</div>
+      </div>
+    </div>
+
+    <div class="story-card" onclick="toggleStory(this)">
+      <div class="story-header">
+        <span class="story-ports">3306</span>
+        <div>
+          <div class="story-title">MySQL בחר "אקראי"</div>
+          <div style="font-size:14px;color:var(--text-3);">ולמה זה מסוכן כשפתוח?</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="story-body">
+        מפתחי MySQL בחרו 3306 — אין סיפור מיוחד מאחורי המספר. אבל יש חשיבות ענקית:<br><br>
+        מסד נתונים <strong style="color:var(--red);">אף פעם</strong> לא אמור להיות נגיש מחוץ לשרת עצמו. רק האפליקציה שרצה על אותו מחשב צריכה גישה אליו.<br><br>
+        אם אתם רואים 3306 פתוח בסריקה — זה אחד הממצאים החמורים ביותר.
+        <div class="story-hook">וו זיכרון: 3306 = הכספת במרתף. אם פתוחה לרחוב — קריאת חירום.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4: שורות פתיחה -->
+  <div class="screen" id="s4">
+    <div class="eyebrow">פענוח הפלט — חלק 1</div>
+    <h2 style="font-size:18px;margin-bottom:10px;">שורה 1–2: מי ואיפה</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:10px;">לחצו על כל שורה מודגשת להסבר</p>
+
+    <div class="ann-wrap" style="margin-bottom:14px;">
+      <span class="ann-line hl" onclick="toggleAnn('a1')">Nmap scan report for office-srv.local (192.168.1.50)</span>
+      <div class="ann-pop" id="a1">
+        <strong style="color:var(--accent-hi);">office-srv.local</strong> = שם המחשב ברשת (hostname). שמות שמסתיימים ב-<code>.local</code> הם רשת פנימית בלבד.<br><br>
+        <strong style="color:var(--accent-hi);">(192.168.1.50)</strong> = כתובת IP. כתובת שמתחילה ב-<code>192.168.</code> היא תמיד רשת פנימית — לא נגישה ישירות מהאינטרנט.
+      </div>
+      <span class="ann-line hl" onclick="toggleAnn('a2')">Host is up (0.00089s latency).</span>
+      <div class="ann-pop" id="a2">
+        <strong style="color:var(--green);">Host is up</strong> = nmap קיבל תשובה. המחשב פועל.<br><br>
+        <strong style="color:var(--accent-hi);">latency</strong> = זמן שלקח להגיע ולחזור. זה מספר לוקח לכם:
+      </div>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-2);margin-bottom:8px;font-family:'Rubik',sans-serif;font-weight:700;">ה-latency מספר איפה המחשב:</p>
+    <div class="latency-row">
+      <span class="lat-val" style="color:var(--green);">0.001s</span>
+      <div class="lat-bar"><div class="lat-fill" style="width:5%;background:var(--green);"></div></div>
+      <span class="lat-label">רשת ביתית / משרד</span>
+    </div>
+    <div class="latency-row">
+      <span class="lat-val" style="color:var(--yellow);">0.05s</span>
+      <div class="lat-bar"><div class="lat-fill" style="width:35%;background:var(--yellow);"></div></div>
+      <span class="lat-label">שרת בארץ</span>
+    </div>
+    <div class="latency-row">
+      <span class="lat-val" style="color:var(--orange);">0.15s</span>
+      <div class="lat-bar"><div class="lat-fill" style="width:65%;background:var(--orange);"></div></div>
+      <span class="lat-label">שרת בחו"ל (ארה"ב)</span>
+    </div>
+    <div class="latency-row">
+      <span class="lat-val" style="color:var(--red);">0.30s+</span>
+      <div class="lat-bar"><div class="lat-fill" style="width:95%;background:var(--red);"></div></div>
+      <span class="lat-label">שרת מאוד רחוק / עמוס</span>
+    </div>
+  </div>
+
+  <!-- S5: Not shown + עמודות -->
+  <div class="screen" id="s5">
+    <div class="eyebrow">פענוח הפלט — חלק 2</div>
+    <h2 style="font-size:18px;margin-bottom:10px;">שורה 3–4: מה נבדק ומה מוצג</h2>
+
+    <div class="ann-wrap" style="margin-bottom:12px;">
+      <span class="ann-line hl" onclick="toggleAnn('b1')">Not shown: 997 closed tcp ports</span>
+      <div class="ann-pop" id="b1">
+        nmap בדק 1,000 פורטים נפוצים.<br><br>
+        997 מהם קיבלו RST = סגורים. nmap <strong style="color:var(--accent-hi);">לא מציג אותם</strong> כי אין בהם מידע שימושי — כמו לרשום "אין דואר" על 997 תיבות.<br><br>
+        <strong style="color:var(--green);">רק 3 הפורטים המעניינים יוצגו בטבלה.</strong>
+      </div>
+      <span class="ann-line hl" onclick="toggleAnn('b2')">PORT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATE&nbsp;&nbsp;&nbsp;&nbsp;SERVICE&nbsp;&nbsp;&nbsp;VERSION</span>
+      <div class="ann-pop" id="b2">
+        4 עמודות. כל אחת מספרת משהו שונה. לחצו על "הבא" לפירוט המלא.
+      </div>
+    </div>
+
+    <table class="col-table">
+      <tr>
+        <th>עמודה</th>
+        <th>מה זה?</th>
+        <th>דוגמה</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent-hi);">PORT</strong></td>
+        <td><span class="col-he">מספר הפורט + פרוטוקול</span></td>
+        <td>22/tcp</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent-hi);">STATE</strong></td>
+        <td><span class="col-he">מצב הדלת</span></td>
+        <td>open / closed / filtered</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent-hi);">SERVICE</strong></td>
+        <td><span class="col-he">מה nmap מצפה לפי מספר ידוע</span></td>
+        <td>ssh, http, mysql</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--yellow);">VERSION</strong></td>
+        <td><span class="col-he">מה באמת רץ שם (רק עם -sV)</span></td>
+        <td>OpenSSH 8.9p1</td>
+      </tr>
+    </table>
+
+    <div class="insight-box yellow">⭐ <strong style="color:var(--text);">SERVICE ≠ VERSION</strong> — זה ההבדל החשוב ביותר. המסך הבא יסביר.</div>
+  </div>
+
+  <!-- S6: SERVICE vs VERSION -->
+  <div class="screen" id="s6">
+    <div class="eyebrow">ההבדל הקריטי</div>
+    <h2 style="font-size:18px;margin-bottom:10px;">SERVICE vs VERSION</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="card" style="border-color:rgba(30,198,255,0.3);">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--accent-hi);margin-bottom:8px;font-size:13px;">SERVICE</div>
+        <div style="font-size:14px;color:var(--text-3);line-height:1.6;">מה nmap <em>מצפה</em> לפי מספר הפורט.<br><br>nmap מסתכל במסד הנתונים שלו: "פורט 22? כנראה SSH".<br><br>זה ניחוש מבוסס — לא אמת מוחלטת.</div>
+      </div>
+      <div class="card" style="border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.03);">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--yellow);margin-bottom:8px;font-size:13px;">VERSION</div>
+        <div style="font-size:14px;color:var(--text-3);line-height:1.6;">מה <em>באמת</em> רץ שם.<br><br>nmap שולח בקשה לשירות ושואל: "מי אתה?" השירות עונה עם הגרסה.<br><br>דורש פקודה: <code style="color:var(--yellow);font-size:11px;">nmap -sV</code></div>
+      </div>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-2);margin-bottom:8px;font-family:'Rubik',sans-serif;font-weight:700;">למה זה חשוב?</p>
+
+    <div class="card gap">
+      <div style="font-family:'Courier New',monospace;font-size:12px;direction:ltr;margin-bottom:8px;">
+        <span style="color:var(--text-3);">בלי -sV:</span><br>
+        <span style="color:var(--green);">80/tcp  open  http</span>
+      </div>
+      <div style="font-size:14px;color:var(--text-3);">כל מה שיודעים: יש שרת אינטרנט. איזה? לא ידוע.</div>
+    </div>
+
+    <div class="card gap" style="border-color:rgba(255,215,0,0.25);background:rgba(255,215,0,0.03);">
+      <div style="font-family:'Courier New',monospace;font-size:12px;direction:ltr;margin-bottom:8px;">
+        <span style="color:var(--yellow);">עם -sV:</span><br>
+        <span style="color:var(--green);">80/tcp  open  http  </span><span style="color:var(--yellow);">Apache httpd 2.4.7</span>
+      </div>
+      <div style="font-size:14px;color:var(--text-3);">עכשיו יודעים: Apache גרסה 2.4.7 — גרסה <strong style="color:var(--red);">ישנה מ-2013</strong> עם חולשות ידועות. <strong style="color:var(--accent-hi);">זה ממצא אמיתי.</strong></div>
+    </div>
+
+    <div class="insight-box">🎯 מגן מחפש גרסאות ישנות כדי לעדכן. תוקף מחפש גרסאות ישנות כדי לנצל. <strong style="color:var(--text);">אותה פקודה — כוונה שונה.</strong></div>
+  </div>
+
+  <!-- S7: דגלי nmap -->
+  <div class="screen" id="s7">
+    <div class="eyebrow">מילון הפקודות</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">מה כל אות בדגל אומרת</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:12px;">לחצו על כל דגל לפירוט. האות הגדולה היא המפתח לזיכרון.</p>
+
+    <div class="flag-grid">
+      <div class="flag-card" onclick="toggleFlag(this)">
+        <div class="flag-meaning">ping sweep בלבד</div>
+        <div class="flag-code">-<span class="flag-letter">s</span><span class="flag-letter">n</span></div>
+        <div class="flag-explain">
+          <strong style="color:var(--accent-hi);">s</strong>can — <strong style="color:var(--accent-hi);">n</strong>o ports<br><br>
+          רק בודק מי מחובר לרשת. <em>לא</em> סורק פורטים.<br>
+          <code style="color:var(--yellow);font-size:11px;">nmap -sn 192.168.1.0/24</code>
+        </div>
+      </div>
+      <div class="flag-card" onclick="toggleFlag(this)">
+        <div class="flag-meaning">זיהוי גרסה</div>
+        <div class="flag-code">-<span class="flag-letter">s</span><span class="flag-letter">V</span></div>
+        <div class="flag-explain">
+          <strong style="color:var(--accent-hi);">s</strong>can — <strong style="color:var(--accent-hi);">V</strong>ersion<br><br>
+          שואל כל שירות "מה גרסתך?". ממלא את עמודת VERSION.<br>
+          <code style="color:var(--yellow);font-size:11px;">nmap -sV 192.168.1.10</code>
+        </div>
+      </div>
+      <div class="flag-card" onclick="toggleFlag(this)">
+        <div class="flag-meaning">סריקה חשאית</div>
+        <div class="flag-code">-<span class="flag-letter">s</span><span class="flag-letter">S</span></div>
+        <div class="flag-explain">
+          <strong style="color:var(--accent-hi);">s</strong>can — <strong style="color:var(--accent-hi);">S</strong>YN<br><br>
+          חצי לחיצת יד — כזכור מיחידה 5. ברירת מחדל לסריקה רגילה.<br>
+          <code style="color:var(--yellow);font-size:11px;">nmap -sS 192.168.1.10</code>
+        </div>
+      </div>
+      <div class="flag-card" onclick="toggleFlag(this)">
+        <div class="flag-meaning">פורטים ספציפיים</div>
+        <div class="flag-code">-<span class="flag-letter">p</span></div>
+        <div class="flag-explain">
+          <strong style="color:var(--accent-hi);">p</strong>orts<br><br>
+          במקום לסרוק 1000 פורטים, סורק רק את אלה שציינתם.<br>
+          <code style="color:var(--yellow);font-size:11px;">nmap -p 22,80,443 192.168.1.10</code>
+        </div>
+      </div>
+      <div class="flag-card" onclick="toggleFlag(this)">
+        <div class="flag-meaning">דלג על פינג</div>
+        <div class="flag-code">-<span class="flag-letter">P</span><span class="flag-letter">n</span></div>
+        <div class="flag-explain">
+          <strong style="color:var(--accent-hi);">P</strong>ing — <strong style="color:var(--accent-hi);">n</strong>one<br><br>
+          אל תבדוק אם המחשב דולק, פשוט סרוק. שימושי כשפינג חסום.<br>
+          <code style="color:var(--yellow);font-size:11px;">nmap -Pn 192.168.1.10</code>
+        </div>
+      </div>
+      <div class="flag-card" onclick="toggleFlag(this)">
+        <div class="flag-meaning">שלב הכל</div>
+        <div class="flag-code">-<span class="flag-letter">s</span><span class="flag-letter">V</span> -<span class="flag-letter">p</span></div>
+        <div class="flag-explain">
+          אפשר לשלב דגלים!<br><br>
+          סרוק פורטים ספציפיים + זהה גרסאות:<br>
+          <code style="color:var(--yellow);font-size:11px;">nmap -sV -p 22,80,443 192.168.1.10</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S8: פלט מלא — הכל ביחד -->
+  <div class="screen" id="s8">
+    <div class="eyebrow">הכל ביחד</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">פענחו את הפלט המלא</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:10px;">לחצו על כל שורה מודגשת. הפעם — בלי עזרה.</p>
+
+    <div class="ann-wrap">
+      <span class="ann-line hl" onclick="toggleAnn('c1')">Nmap scan report for office-srv.local (192.168.1.50)</span>
+      <div class="ann-pop" id="c1">שם: office-srv.local | IP: 192.168.1.50 | 192.168.x.x = רשת פנימית — לא נגיש מהאינטרנט</div>
+      <span class="ann-line hl" onclick="toggleAnn('c2')">Host is up (0.00089s latency).</span>
+      <div class="ann-pop" id="c2">המחשב פועל. latency 0.89ms = אותה רשת מקומית — המחשב ממש קרוב.</div>
+      <span class="ann-line hl" onclick="toggleAnn('c3')">Not shown: 997 closed tcp ports</span>
+      <div class="ann-pop" id="c3">nmap בדק 1,000 פורטים. 997 קיבלו RST (סגורים) ולא מוצגים. רק 3 מעניינים.</div>
+      <span class="ann-line" style="color:var(--text-3);">PORT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATE&nbsp;&nbsp;&nbsp;&nbsp;SERVICE&nbsp;&nbsp;&nbsp;VERSION</span>
+      <span class="ann-line hl-green" onclick="toggleAnn('c4')">22/tcp&nbsp;&nbsp; open&nbsp;&nbsp;&nbsp;&nbsp; ssh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OpenSSH 8.9p1</span>
+      <div class="ann-pop" id="c4">✅ פורט 22 = SSH פתוח. גרסה: OpenSSH 8.9p1 — גרסה עדכנית. בסדר. מנהל משתמש בו לגישה מרחוק.</div>
+      <span class="ann-line hl-green" onclick="toggleAnn('c5')">80/tcp&nbsp;&nbsp; open&nbsp;&nbsp;&nbsp;&nbsp; http&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Apache httpd 2.4.54</span>
+      <div class="ann-pop" id="c5">✅ פורט 80 = HTTP פתוח. Apache 2.4.54 — גרסה סבירה. אתר אינטרנט פנימי. כדאי לוודא שמפנה ל-443.</div>
+      <span class="ann-line hl-yellow" onclick="toggleAnn('c6')">23/tcp&nbsp;&nbsp; open&nbsp;&nbsp;&nbsp;&nbsp; telnet</span>
+      <div class="ann-pop" id="c6">⚠️ פורט 23 = Telnet פתוח. פרוטוקול ישן מ-1969 שמעביר הכל בטקסט גלוי. SSH (22) פתוח — אין סיבה לקיום Telnet. <strong style="color:var(--red);">סגרו אותו.</strong></div>
+      <span class="ann-line hl-red" onclick="toggleAnn('c7')">3306/tcp open&nbsp;&nbsp;&nbsp;&nbsp; mysql&nbsp;&nbsp;&nbsp;&nbsp; MySQL 5.7.38</span>
+      <div class="ann-pop" id="c7">🔴 פורט 3306 = MySQL פתוח לרשת! גרסה 5.7.38 — ישנה. מסד נתונים לא אמור להיות נגיש. <strong style="color:var(--red);">ממצא חמור — סגירה מיידית.</strong></div>
+    </div>
+
+    <div class="insight-box red">🔴 <strong style="color:var(--text);">ציון אבטחה:</strong> פורט 23 פתוח + פורט 3306 פתוח = שני ממצאים קריטיים. זה השרת שיחידה 7 תלמד אתכם לנתח לעומק.</div>
+  </div>
+
+  <!-- S9: Terminal -->
+  <div class="screen" id="s9">
+    <div class="eyebrow">תרגיל</div>
+    <h2 style="font-size:18px;margin-bottom:10px;">נסו בעצמכם</h2>
+    <div class="hint-row">
+      <button class="hint-btn" onclick="fillCmd('nmap -sn 192.168.1.0/24')">nmap -sn 192.168.1.0/24</button>
+      <button class="hint-btn" onclick="fillCmd('nmap 192.168.1.10')">nmap 192.168.1.10</button>
+      <button class="hint-btn" onclick="fillCmd('nmap -sV 192.168.1.10')">nmap -sV 192.168.1.10</button>
+      <button class="hint-btn" onclick="fillCmd('nmap -p 22,80,3306 192.168.1.10')">nmap -p 22,80,3306</button>
+    </div>
+    <div class="sim-wrap">
+      <div class="sim-bar">
+        <span class="sim-dot" style="background:#FF5F57;"></span>
+        <span class="sim-dot" style="background:#FEBC2E;"></span>
+        <span class="sim-dot" style="background:#28C840;"></span>
+        <span style="font-size:14px;color:var(--text-3);margin-right:8px;">Cyber Lab — סביבה מדומה</span>
+      </div>
+      <div class="sim-output" id="simOut">user@cyberlab:~$ </div>
+      <div class="sim-input-row">
+        <span style="color:var(--green);font-family:'Courier New',monospace;font-size:13px;white-space:nowrap;">user@cyberlab:~$</span>
+        <input type="text" class="sim-input" id="simIn" placeholder="הקלד פקודה ולחץ Enter..." autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+    <div class="insight-box" style="font-size:14px;">💡 שימו לב לעמודת VERSION כשמריצים עם <code style="color:var(--yellow);">-sV</code> — היא מספקת מידע שהעמודה SERVICE לא יכולה לתת.</div>
+  </div>
+
+  <!-- S10: Quiz -->
+  <div class="screen" id="s10">
+    <div class="eyebrow">בוחן</div>
+    <h2 style="font-size:18px;margin-bottom:14px;">בדקו את עצמכם</h2>
+
+    <div class="mc-block">
+      <div class="mc-q">1. סריקה מחזירה <code style="color:var(--yellow);direction:ltr;unicode-bidi:isolate;">0.15s latency</code>. מה זה מספר לנו?</div>
+      <div class="mc-options" id="q1o">
+        <div class="mc-opt" onclick="answerQ(1,this,false)">המחשב רחוק ממני ברשת הפנימית</div>
+        <div class="mc-opt" onclick="answerQ(1,this,true)">השרת כנראה בחו"ל — זמן תגובה גבוה = מרחק פיזי</div>
+        <div class="mc-opt" onclick="answerQ(1,this,false)">המחשב איטי ועמוס</div>
+      </div>
+      <div class="mc-feedback" id="fb1"></div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">2. מה ההבדל בין SERVICE ל-VERSION בפלט nmap?</div>
+      <div class="mc-options" id="q2o">
+        <div class="mc-opt" onclick="answerQ(2,this,false)">אין הבדל, שניהם מציגים את אותו מידע</div>
+        <div class="mc-opt" onclick="answerQ(2,this,true)">SERVICE = מה nmap מצפה לפי מספר הפורט. VERSION = מה באמת רץ שם (רק עם -sV)</div>
+        <div class="mc-opt" onclick="answerQ(2,this,false)">SERVICE = שם הפרוטוקול. VERSION = מספר הפורט</div>
+      </div>
+      <div class="mc-feedback" id="fb2"></div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">3. למה SSH קיבל את פורט 22 ולא פורט 24 או אחר?</div>
+      <div class="mc-options" id="q3o">
+        <div class="mc-opt" onclick="answerQ(3,this,false)">כי 22 הוא מספר ראשוני ויש לו יתרונות טכניים</div>
+        <div class="mc-opt" onclick="answerQ(3,this,false)">כי 22 היה הפורט הפנוי הראשון שנמצא</div>
+        <div class="mc-opt" onclick="answerQ(3,this,true)">כי SSH נוצר להחליף את Telnet (23) — המפתח בחר 22 במכוון, ממש לפני 23</div>
+      </div>
+      <div class="mc-feedback" id="fb3"></div>
+    </div>
+
+    <div id="quiz-done" style="display:none;">
+      <div class="check-success">✅ מצוין! עכשיו אתם קוראים פלט סריקה כמו מקצוענים</div>
+    </div>
+  </div>
+
+  <!-- S11: Summary -->
+  <div class="screen" id="s11">
+    <div class="eyebrow">סיכום</div>
+    <h2 style="font-size:18px;margin-bottom:14px;">מה למדנו ביחידה 6</h2>
+    <div class="summary-points">
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>הבניין הדיגיטלי:</strong> כל פורט = דלת. 22 = דלת אחורית מאובטחת. 23 = דלת ישנה בלי מנעול. 3306 = כספת שאסור לרחוב. 8080 = 80+80.</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>22 לפני 23:</strong> SSH נוצר ב-1995 להחליף את Telnet — המפתח בחר 22 כי זה ממש לפני 23. סיפור אמיתי שעוזר לזכור.</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>SERVICE ≠ VERSION:</strong> SERVICE = ניחוש לפי מספר פורט ידוע. VERSION = מה באמת רץ — דורש <code>-sV</code> ומכיל את המידע הקריטי לאבטחה.</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>דגלים:</strong> -sn (no ports), -sV (Version), -sS (SYN), -p (ports), -Pn (skip Ping). כל אות היא קיצור של המילה.</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>latency:</strong> 0.001s = רשת מקומית. 0.15s = שרת בחו"ל. latency גבוה = מרחק פיזי.</div></div>
+    </div>
+    <div class="next-card">
+      <div class="next-icon"><i data-lucide="arrow-left-circle" width="20" height="20"></i></div>
+      <div>
+        <div class="next-label">יחידה הבאה</div>
+        <div class="next-text"><strong style="color:var(--text);">יחידה 7 — ניתוח תוצאות וסיכונים</strong><br>עכשיו שיודעים לקרוא כל שורה — ניקח פלטים אמיתיים ונחליט: מה מסוכן, מה דחוף, ומה ציון האבטחה הכללי.</div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /screens -->
+
+  <div class="dots" id="dotNav"></div>
+  <div class="nav">
+    <button class="btn btn-back" id="btnBack" onclick="navigate(-1)" style="display:none;">הקודם →</button>
+    <button class="btn btn-primary" id="btnNext" onclick="navigate(1)">← הבא</button>
+  </div>
+</div>
+
+<script>
+var scormAPI=null;
+function findAPI(w){var t=0;while(!w.API&&w.parent&&w.parent!==w&&t<7){w=w.parent;t++;}return w.API||null;}
+try{scormAPI=findAPI(window);}catch(e){}
+function scormSet(k,v){try{if(scormAPI)scormAPI.LMSSetValue(k,v);}catch(e){}}
+function scormInit(){try{if(scormAPI){scormAPI.LMSInitialize('');scormSet('cmi.core.lesson_status','incomplete');}}catch(e){}}
+function scormComplete(){try{if(scormAPI){scormSet('cmi.core.lesson_status','completed');scormSet('cmi.core.score.raw','100');scormAPI.LMSCommit('');scormAPI.LMSFinish('');}}catch(e){}}
+scormInit();
+var UNIT_ID = 6, UNIT_XP = 200;
+function completeAndReturn() {
+  scormComplete();
+  try {
+    var u = localStorage.getItem('cp_current');
+    if (u) {
+      var users = JSON.parse(localStorage.getItem('cp_users') || '{}');
+      var d = users[u];
+      if (d && !d.completedUnits.includes(UNIT_ID)) {
+        d.completedUnits.push(UNIT_ID);
+        d.xp = (d.xp || 0) + UNIT_XP;
+        localStorage.setItem('cp_users', JSON.stringify(users));
+      }
+    }
+  } catch(e) {}
+  window.location.href = '../../index.html';
+}
+
+var TOTAL=12,current=0;
+var pFill=document.getElementById('progressFill');
+var btnBack=document.getElementById('btnBack');
+var btnNext=document.getElementById('btnNext');
+var counter=document.getElementById('screenCounter');
+
+function buildDots(){
+  var nav=document.getElementById('dotNav');
+  for(var i=0;i<TOTAL;i++){
+    var d=document.createElement('button');
+    d.className='dot'+(i===0?' active':'');
+    (function(idx){d.onclick=function(){goToScreen(idx);};})(i);
+    nav.appendChild(d);
+  }
+}
+function updateNav(){
+  btnBack.style.display=current===0?'none':'block';
+  btnNext.textContent=current===TOTAL-1?'סיום ✓':'← הבא';
+  pFill.style.width=((current+1)/TOTAL*100)+'%';
+  counter.textContent=(current+1)+' / '+TOTAL;
+  document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===current);});
+}
+function goToScreen(n){
+  if(n<0||n>=TOTAL||n===current)return;
+  var prev=document.getElementById('s'+current);
+  var nxt=document.getElementById('s'+n);
+  prev.classList.add('exit');prev.classList.remove('active');
+  setTimeout(function(){prev.classList.remove('exit');nxt.classList.add('active');current=n;updateNav();},220);
+}
+function navigate(dir){
+  if(dir===1&&current===TOTAL-1){completeAndReturn();return;}
+  goToScreen(current+dir);
+}
+buildDots();
+updateNav();
+
+function toggleAnn(id){var el=document.getElementById(id);if(el)el.classList.toggle('show');}
+
+function revealHook(){
+  document.getElementById('hook-q').style.display='none';
+  document.getElementById('hook-a').style.display='block';
+}
+
+function toggleStory(card){
+  var body=card.querySelector('.story-body');
+  body.classList.toggle('open');
+}
+
+function toggleFlag(card){
+  var exp=card.querySelector('.flag-explain');
+  exp.classList.toggle('open');
+}
+
+var cmds={
+  'nmap -sn 192.168.1.0/24':
+    'Starting Nmap 7.94...\n'+
+    '<span class="ok">Nmap scan report for 192.168.1.1  — Host is up (0.001s)</span>  <span class="hi">[ראוטר]</span>\n'+
+    '<span class="ok">Nmap scan report for 192.168.1.10 — Host is up (0.002s)</span>  <span class="hi">[שרת]</span>\n'+
+    '<span class="ok">Nmap scan report for 192.168.1.25 — Host is up (0.003s)</span>  <span class="hi">[מחשב]</span>\n'+
+    '<span class="warn">Nmap scan report for 192.168.1.30 — Host is up (0.009s)</span> <span class="warn">[מדפסת?]</span>\n\n'+
+    'Nmap done: 256 IP addresses, <span class="ok">4 hosts up</span>, scanned in 2.31 seconds\n'+
+    '<span class="hi">→ latency 0.001–0.009s = כולם ברשת מקומית. הבא: nmap -sV 192.168.1.10</span>',
+
+  'nmap 192.168.1.10':
+    'Starting Nmap 7.94...\n'+
+    'Nmap scan report for 192.168.1.10\n'+
+    'Host is up (0.002s latency).\n'+
+    'Not shown: 997 closed tcp ports\n\n'+
+    'PORT     STATE   SERVICE\n'+
+    '<span class="ok">22/tcp   open    ssh</span>\n'+
+    '<span class="ok">80/tcp   open    http</span>\n'+
+    '<span class="warn">23/tcp   open    telnet</span>\n'+
+    '<span class="err">3306/tcp open    mysql</span>\n\n'+
+    'Nmap done: 1 IP scanned in 0.52 seconds\n'+
+    '<span class="warn">⚠ ללא -sV רואים SERVICE בלבד. הוסיפו -sV לגרסאות.</span>',
+
+  'nmap -sv 192.168.1.10':
+    'Starting Nmap 7.94...\n\n'+
+    'PORT     STATE   SERVICE  VERSION\n'+
+    '<span class="ok">22/tcp   open    ssh      OpenSSH 8.9p1 Ubuntu</span>\n'+
+    '<span class="ok">80/tcp   open    http     Apache httpd 2.4.54</span>\n'+
+    '<span class="warn">23/tcp   open    telnet   Linux telnetd</span>\n'+
+    '<span class="err">3306/tcp open    mysql    MySQL 5.7.38</span>\n\n'+
+    'Service detection performed.\n'+
+    '<span class="hi">→ עמודת VERSION: עכשיו יודעים בדיוק מה רץ.</span>\n'+
+    '<span class="err">⚠ MySQL 5.7.38 — גרסה ישנה עם CVEs ידועים.</span>',
+
+  'nmap -p 22,80,3306 192.168.1.10':
+    'Starting Nmap 7.94...\n\n'+
+    'PORT     STATE   SERVICE\n'+
+    '<span class="ok">22/tcp   open    ssh</span>\n'+
+    '<span class="ok">80/tcp   open    http</span>\n'+
+    '<span class="err">3306/tcp open    mysql</span>\n\n'+
+    'Nmap done: 1 IP scanned in 0.31 seconds\n'+
+    '<span class="hi">→ -p סרק רק 3 פורטים במקום 1000 — מהיר יותר כשיודעים מה לחפש.</span>'
+};
+
+document.getElementById('simIn').addEventListener('keydown',function(e){if(e.key==='Enter')runSim();});
+function runSim(){
+  var inp=document.getElementById('simIn');
+  var cmd=inp.value.trim();
+  if(!cmd)return;
+  var out=document.getElementById('simOut');
+  var key=cmd.toLowerCase();
+  var resp=cmds[key]||'<span class="err">פקודה לא מוכרת.</span>\nנסה:\n  nmap -sn 192.168.1.0/24\n  nmap 192.168.1.10\n  nmap -sV 192.168.1.10\n  nmap -p 22,80,3306 192.168.1.10';
+  out.innerHTML+='user@cyberlab:~$ '+cmd+'\n'+resp+'\n\nuser@cyberlab:~$ ';
+  out.scrollTop=out.scrollHeight;
+  inp.value='';
+}
+function fillCmd(c){document.getElementById('simIn').value=c;document.getElementById('simIn').focus();}
+
+var done={1:false,2:false,3:false};
+var correctIdx={1:1,2:1,3:2};
+function answerQ(q,btn,isCorrect){
+  if(done[q])return;
+  done[q]=true;
+  var opts=Array.from(document.getElementById('q'+q+'o').querySelectorAll('.mc-opt'));
+  opts.forEach(function(o){o.style.pointerEvents='none';});
+  var fb=document.getElementById('fb'+q);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='mc-feedback ok';
+    fb.innerHTML={
+      1:'✓ נכון! 150ms = מרחק פיזי. שרת בארה"ס = ~150ms. רשת מקומית = 1ms.',
+      2:'✓ בדיוק! SERVICE = ניחוש לפי מספר ידוע. VERSION = מה שהשירות עצמו אמר — דורש -sV.',
+      3:'✓ נכון! Tatu Ylönen בחר 22 במכוון — SSH ממש לפני Telnet (23), כי זה בא להחליף אותו.'
+    }[q];
+  }else{
+    btn.classList.add('wrong');
+    opts[correctIdx[q]].classList.add('reveal');
+    fb.className='mc-feedback err';
+    fb.innerHTML={
+      1:'✗ latency = מרחק פיזי. 0.001ms = אותו חדר. 150ms = חו"ל. זה לא קשור למהירות המחשב.',
+      2:'✗ השוני קריטי! SERVICE = ניחוש לפי מספר ידוע. VERSION = מה שהשירות עצמו דיווח.',
+      3:'✗ המפתח בחר 22 במכוון — ממש לפני Telnet (23). SSH נולד כדי להחליף אותו.'
+    }[q];
+  }
+  if(done[1]&&done[2]&&done[3]){
+    document.getElementById('quiz-done').style.display='block';
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

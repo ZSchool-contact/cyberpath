@@ -1,0 +1,31 @@
+/* פלטת קורס ראשון — סייבר כהה */
+
+/* Primary — כחולים כהים (רקעים) */
+$bg-deep:    #061A2F;   /* רקע ראשי עמוק */
+$bg-mid:     #0B2E4F;   /* שכבת רקע נוספת / גרדיאנט */
+$bg-depth:   #123F6B;   /* אזורי עומק */
+$bg-darkest: #0A0F1C;   /* רקע עמוק מאוד */
+
+/* Accent — ניאון / כחול זוהר */
+$accent-primary:   #1EC6FF;   /* כפתורים, אייקונים — הדגשה מרכזית */
+$accent-strong:    #00AEEF;   /* וריאציה חזקה יותר */
+$accent-highlight: #5BE0FF;   /* היילייטים / glow */
+
+/* Secondary — כחול-טורקיז רך */
+$secondary-dark:  #2F8FAD;
+$secondary-light: #3BA7C9;
+
+/* Neutrals — טקסט */
+$text-primary:   #FFFFFF;   /* טקסט ראשי על רקע כהה */
+$text-secondary: #C7D3E0;   /* טקסט משני */
+$text-muted:     #7F9BB3;   /* טקסט חלש / placeholder */
+
+/* Glow / Effects */
+$glow-bright: #00F0FF;
+$glow-soft:   rgba(0, 174, 239, 0.4);
+
+/* שימוש מומלץ */
+/* $bg-deep + $bg-mid   → רקע כללי בגרדיאנט */
+/* $accent-primary      → כפתורי CTA, progress, הדגשות */
+/* $text-primary        → כל טקסט על רקע כהה */
+/* $glow-soft           → צלליות, hover states, borders זוהרים */

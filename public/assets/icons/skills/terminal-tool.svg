@@ -1,0 +1,31 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 12H55V52H9Z"/>
+    <path d="M9 21H55"/>
+    <path d="M14 17H14.2M20 17H20.2M26 17H26.2"/>
+    <path d="M49 16H53M45 16H46" stroke-width="1" opacity="0.75"/>
+  </g>
+  <g filter="url(#glow)" font-family="monospace" font-size="5.2" fill="#00e5ff">
+    <text x="14" y="31">&gt; nmap -sV</text>
+    <text x="14" y="39">&gt; 192.168.1</text>
+  </g>
+  <g filter="url(#glow)">
+    <text x="14" y="47" font-family="monospace" font-size="5.2" fill="#00e5ff">&gt;</text>
+    <rect x="22" y="43" width="4" height="4" fill="#00ff9d"/>
+    <rect x="27" y="43" width="4" height="4" fill="#00ff9d"/>
+    <rect x="32" y="43" width="4" height="4" fill="#00ff9d"/>
+    <rect x="37" y="43" width="4" height="4" fill="#00ff9d"/>
+    <rect x="42" y="43" width="4" height="4" fill="#00ff9d" opacity="0.35"/>
+    <rect x="47" y="43" width="4" height="4" fill="#00ff9d" opacity="0.2"/>
+  </g>
+</svg>
+

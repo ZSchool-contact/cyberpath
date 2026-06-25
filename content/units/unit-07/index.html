@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>יחידה 7 — ניתוח תוצאות וסיכונים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Heebo:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#040E1C; --bg-mid:#0B2E4F; --glass:rgba(8,28,52,0.55);
+  --accent:#1EC6FF; --accent-hi:#5BE0FF; --accent-str:#00AEEF;
+  --glow:rgba(30,198,255,0.35); --glow-str:rgba(30,198,255,0.6);
+  --text:#FFFFFF; --text-2:#C7D3E0; --text-3:#7F9BB3;
+  --border:rgba(30,198,255,0.14);
+  --green:#00DC78; --red:#FF5050; --yellow:#FFD700; --orange:#FF8C42;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3{font-family:'Rubik',sans-serif;font-weight:900;}
+
+.bg-image{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(rgba(4,14,28,0.62),rgba(4,14,28,0.62)),
+  url('../../assets/icons/unit-01/cyber-networks-course-background.png') center/cover no-repeat;}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(30,198,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(30,198,255,0.035) 1px,transparent 1px);
+  background-size:48px 48px;}
+.bg-blob{position:fixed;z-index:0;border-radius:50%;filter:blur(90px);pointer-events:none;}
+.bg-blob-1{width:500px;height:500px;top:-160px;left:-100px;background:radial-gradient(circle,rgba(30,198,255,0.09),transparent 70%);}
+.bg-blob-2{width:400px;height:400px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(0,80,160,0.14),transparent 70%);}
+
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh;max-width:680px;margin:0 auto;background:rgba(4,14,28,0.65);}
+.progress-bar{height:3px;background:rgba(30,198,255,0.08);overflow:hidden;flex-shrink:0;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-str),var(--accent-hi));box-shadow:0 0 12px var(--glow-str);transition:width 0.5s cubic-bezier(.4,0,.2,1);}
+.unit-header{padding:11px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(4,14,28,0.7);backdrop-filter:blur(10px);flex-shrink:0;}
+.unit-badge{font-family:'Rubik',sans-serif;font-weight:700;font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--glow-str);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.screen-counter{font-size:12px;color:var(--text-3);}
+
+.screens{flex:1;overflow:hidden;position:relative;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;padding:20px 20px 8px;overflow-y:auto;opacity:0;pointer-events:none;transform:translateX(-30px);transition:opacity 0.3s ease,transform 0.3s ease;}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.screen.exit{opacity:0;transform:translateX(30px);pointer-events:none;}
+
+.dots{display:flex;justify-content:center;gap:5px;padding:8px 0 4px;flex-shrink:0;}
+.dot{width:5px;height:5px;border-radius:3px;background:rgba(30,198,255,0.12);transition:all 0.35s cubic-bezier(.4,0,.2,1);cursor:pointer;border:none;}
+.dot.active{width:20px;background:linear-gradient(90deg,var(--accent-str),var(--accent-hi));box-shadow:0 0 10px var(--glow);}
+.nav{padding:6px 20px 20px;display:flex;gap:10px;justify-content:center;align-items:center;flex-shrink:0;}
+.btn{border:none;border-radius:14px;font-family:'Rubik',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.22s ease;}
+.btn-primary{padding:13px 44px;background:linear-gradient(135deg,var(--accent),var(--accent-str));color:#040E1C;border-radius:8px;box-shadow:0 4px 20px rgba(30,198,255,0.3);}
+.btn-primary:hover{box-shadow:0 6px 32px rgba(30,198,255,0.55);transform:translateY(-1px);}
+.btn-back{padding:13px 18px;background:rgba(30,198,255,0.06);color:var(--text-3);border:1px solid rgba(30,198,255,0.15);border-radius:8px;}
+
+/* Atoms */
+.eyebrow{font-family:'Rubik',sans-serif;font-weight:700;font-size:10px;color:var(--accent);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+.card-green{border-color:rgba(0,220,120,0.25);background:rgba(0,220,120,0.04);}
+.card-red{border-color:rgba(255,80,80,0.25);background:rgba(255,80,80,0.04);}
+.card-yellow{border-color:rgba(255,215,0,0.25);background:rgba(255,215,0,0.04);}
+.insight-box{border-radius:12px;padding:13px 16px;border-right:3px solid var(--accent);background:rgba(30,198,255,0.05);font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:12px;}
+.insight-box.green{border-right-color:var(--green);background:rgba(0,220,120,0.05);}
+.insight-box.yellow{border-right-color:var(--yellow);background:rgba(255,215,0,0.05);}
+.insight-box.red{border-right-color:var(--red);background:rgba(255,80,80,0.05);}
+.concept-pill{background:linear-gradient(135deg,rgba(30,198,255,0.1),rgba(0,174,239,0.04));border:1px solid rgba(30,198,255,0.22);border-radius:12px;padding:13px 16px;font-size:14px;color:var(--text-2);line-height:1.55;margin-bottom:12px;}
+
+.obj-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.obj-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:14px;background:var(--glass);border:1px solid var(--border);}
+.obj-num{width:30px;height:30px;flex-shrink:0;background:linear-gradient(135deg,rgba(30,198,255,0.2),rgba(0,174,239,0.1));border:1px solid rgba(30,198,255,0.25);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:900;font-size:13px;color:var(--accent);}
+.obj-text{font-size:14px;line-height:1.5;padding-top:4px;color:var(--text-2);}
+
+/* Annotated output */
+.ann-wrap{background:rgba(4,14,28,0.85);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.ann-line{font-family:'Courier New',monospace;font-size:13px;padding:8px 14px;line-height:1.8;cursor:pointer;transition:background 0.15s;display:block;direction:ltr;unicode-bidi:isolate;color:var(--text-3);}
+.ann-line.hl-green{border-right:3px solid var(--green);background:rgba(0,220,120,0.04);color:var(--green);}
+.ann-line.hl-yellow{border-right:3px solid var(--yellow);background:rgba(255,215,0,0.04);color:var(--yellow);}
+.ann-line.hl-red{border-right:3px solid var(--red);background:rgba(255,80,80,0.04);color:var(--red);}
+.ann-line:hover{background:rgba(30,198,255,0.05);}
+.ann-pop{display:none;font-size:14px;color:var(--text-2);background:rgba(8,28,52,0.95);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin:0 12px 8px;line-height:1.6;animation:fadeUp 0.2s ease;direction:rtl;unicode-bidi:isolate;font-family:'Heebo',sans-serif;}
+.ann-pop.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Quiz */
+.mc-block{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.mc-q{font-size:15px;color:var(--text-2);margin-bottom:12px;line-height:1.5;}
+.mc-options{display:flex;flex-direction:column;gap:8px;}
+.mc-opt{background:rgba(30,198,255,0.04);border:1px solid rgba(30,198,255,0.15);border-radius:9px;padding:11px 14px;font-size:14px;color:var(--text-2);cursor:pointer;text-align:right;transition:all 0.2s;font-family:'Heebo',sans-serif;line-height:1.4;}
+.mc-opt:hover{border-color:rgba(30,198,255,0.35);background:rgba(30,198,255,0.08);}
+.mc-opt.correct{border-color:var(--green);background:rgba(0,220,120,0.08);color:var(--green);pointer-events:none;}
+.mc-opt.wrong{border-color:var(--red);background:rgba(255,80,80,0.08);color:var(--red);pointer-events:none;animation:shake 0.3s ease;}
+.mc-opt.reveal{border-color:var(--green);color:var(--green);pointer-events:none;}
+.mc-feedback{font-size:14px;margin-top:8px;line-height:1.5;}
+.mc-feedback.ok{color:var(--green);}
+.mc-feedback.err{color:var(--red);}
+@keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-4px)}70%{transform:translateX(4px)}}
+.check-success{text-align:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;color:var(--green);background:rgba(0,220,120,0.07);border:1px solid rgba(0,220,120,0.25);border-radius:10px;padding:12px;animation:fadeUp 0.3s ease;margin-top:12px;}
+
+/* Summary */
+.summary-points{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.summary-point{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--glass);border:1px solid var(--border);border-radius:13px;}
+.sp-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;color:var(--green);}
+.sp-text{font-size:14px;color:var(--text-2);line-height:1.5;}
+.sp-text strong{color:var(--text);font-family:'Rubik',sans-serif;}
+.next-card{border-radius:14px;border:1px solid rgba(30,198,255,0.25);background:linear-gradient(135deg,rgba(30,198,255,0.06),rgba(0,174,239,0.02));padding:16px;display:flex;align-items:center;gap:14px;margin-top:4px;}
+.next-icon{flex-shrink:0;width:40px;height:40px;border-radius:10px;background:rgba(30,198,255,0.1);border:1px solid rgba(30,198,255,0.2);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.next-label{font-family:'Rubik',sans-serif;font-weight:700;font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.next-text{font-size:14px;color:var(--text-2);line-height:1.4;}
+
+/* Video placeholder */
+.vp-wrap{border:1px dashed rgba(30,198,255,0.28);border-radius:12px;background:rgba(30,198,255,0.03);padding:16px 14px;margin-bottom:12px;display:flex;align-items:center;gap:14px;}
+.vp-icon-box{flex-shrink:0;width:42px;height:42px;border-radius:10px;background:rgba(30,198,255,0.08);border:1px solid rgba(30,198,255,0.2);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.vp-clip{font-family:'Rubik',sans-serif;font-weight:700;font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.vp-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;}
+.vp-meta{font-size:11px;color:var(--text-3);}
+
+/* Iron Laws */
+.law-card{border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);background:var(--glass);cursor:pointer;transition:border-color 0.2s;}
+.law-card:hover{border-color:rgba(30,198,255,0.3);}
+.law-header{display:flex;align-items:center;gap:12px;}
+.law-num{font-family:'Rubik',sans-serif;font-weight:900;font-size:28px;color:var(--accent);opacity:0.4;min-width:36px;line-height:1;}
+.law-title{font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;}
+.law-body{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
+.law-body.open{display:block;animation:fadeUp 0.2s ease;}
+.law-city{font-size:13px;color:var(--accent-hi);margin-bottom:6px;font-family:'Rubik',sans-serif;font-weight:700;}
+.law-explain{font-size:14px;color:var(--text-2);line-height:1.65;}
+.law-example{margin-top:10px;background:rgba(4,14,28,0.6);border-radius:8px;padding:10px 12px;font-family:'Courier New',monospace;font-size:12px;direction:ltr;}
+
+/* Security score */
+.score-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.score-card{border-radius:12px;padding:14px 10px;text-align:center;border:1px solid var(--border);}
+.score-card.good{border-color:rgba(0,220,120,0.35);background:rgba(0,220,120,0.05);}
+.score-card.medium{border-color:rgba(255,215,0,0.35);background:rgba(255,215,0,0.05);}
+.score-card.bad{border-color:rgba(255,80,80,0.35);background:rgba(255,80,80,0.05);}
+.score-icon{font-size:26px;margin-bottom:6px;}
+.score-label{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px;}
+.score-card.good .score-label{color:var(--green);}
+.score-card.medium .score-label{color:var(--yellow);}
+.score-card.bad .score-label{color:var(--red);}
+.score-criteria{font-size:11px;color:var(--text-3);line-height:1.6;text-align:right;}
+
+/* Recommendation template */
+.rec-card{border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border);}
+.rec-row{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);align-items:flex-start;}
+.rec-row:last-child{border-bottom:none;}
+.rec-label{font-family:'Rubik',sans-serif;font-weight:700;font-size:11px;color:var(--accent);letter-spacing:1px;min-width:72px;padding-top:2px;flex-shrink:0;}
+.rec-val{font-size:14px;color:var(--text-2);line-height:1.5;}
+
+/* Decision scenario */
+.dec-option{border-radius:12px;padding:13px 16px;margin-bottom:9px;border:1.5px solid var(--border);background:var(--glass);cursor:pointer;font-size:14px;color:var(--text-2);line-height:1.5;transition:all 0.2s;font-family:'Heebo',sans-serif;}
+.dec-option:hover{border-color:rgba(30,198,255,0.4);background:rgba(30,198,255,0.06);}
+.dec-option.chosen-right{border-color:var(--green);background:rgba(0,220,120,0.07);color:var(--green);pointer-events:none;}
+.dec-option.chosen-wrong{border-color:var(--red);background:rgba(255,80,80,0.07);color:var(--red);pointer-events:none;}
+.dec-option.reveal-right{border-color:var(--green);color:var(--green);pointer-events:none;}
+.dec-result{display:none;border-radius:10px;padding:12px 16px;margin-top:6px;font-size:14px;line-height:1.6;}
+.dec-result.show{display:block;animation:fadeUp 0.25s ease;}
+.dec-result.ok{background:rgba(0,220,120,0.07);border:1px solid rgba(0,220,120,0.25);color:var(--text-2);}
+.dec-result.err{background:rgba(255,80,80,0.07);border:1px solid rgba(255,80,80,0.2);color:var(--text-2);}
+
+/* Independent activity */
+.port-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--glass);margin-bottom:8px;cursor:pointer;transition:all 0.2s;}
+.port-row:hover{border-color:rgba(30,198,255,0.3);}
+.port-row.revealed-green{border-color:var(--green);background:rgba(0,220,120,0.05);}
+.port-row.revealed-yellow{border-color:var(--yellow);background:rgba(255,215,0,0.04);}
+.port-row.revealed-red{border-color:var(--red);background:rgba(255,80,80,0.05);}
+.port-num-badge{font-family:'Courier New',monospace;font-size:15px;font-weight:700;direction:ltr;min-width:58px;}
+.port-name-badge{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;min-width:60px;}
+.port-detail{display:none;font-size:13px;color:var(--text-3);line-height:1.5;flex:1;}
+.port-detail.show{display:block;}
+.port-risk{margin-right:auto;font-size:18px;flex-shrink:0;}
+.click-hint{font-size:12px;color:var(--text-3);margin-right:auto;}
+
+/* Hook scan infographic */
+.hook-scan-wrap{background:rgba(4,14,28,0.85);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:4px;}
+.hook-scan-header{font-family:'Courier New',monospace;font-size:12px;color:var(--text-3);padding:8px 16px;border-bottom:1px solid var(--border);direction:ltr;letter-spacing:1px;}
+.hook-scan-row{display:flex;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(30,198,255,0.06);transition:background 0.5s,border-color 0.5s;direction:ltr;}
+.hook-scan-row:last-child{border-bottom:none;}
+.hsr-port{font-family:'Courier New',monospace;font-size:14px;font-weight:700;min-width:90px;color:var(--text-2);transition:color 0.4s;}
+.hsr-state{font-family:'Courier New',monospace;font-size:14px;min-width:55px;color:var(--text-3);transition:color 0.4s;}
+.hsr-svc{font-family:'Courier New',monospace;font-size:14px;flex:1;color:var(--text-3);transition:color 0.4s;}
+.hsr-badge{font-size:12px;font-family:'Rubik',sans-serif;font-weight:700;padding:3px 9px;border-radius:5px;opacity:0;transition:opacity 0.4s;white-space:nowrap;}
+.hook-scan-row.rev-green{background:rgba(0,220,120,0.05);}
+.hook-scan-row.rev-green .hsr-port,.hook-scan-row.rev-green .hsr-state,.hook-scan-row.rev-green .hsr-svc{color:var(--green);}
+.hook-scan-row.rev-green .hsr-badge{color:var(--green);background:rgba(0,220,120,0.1);opacity:1;}
+.hook-scan-row.rev-red{background:rgba(255,80,80,0.06);}
+.hook-scan-row.rev-red .hsr-port,.hook-scan-row.rev-red .hsr-state,.hook-scan-row.rev-red .hsr-svc{color:var(--red);}
+.hook-scan-row.rev-red .hsr-badge{color:var(--red);background:rgba(255,80,80,0.1);opacity:1;}
+.hook-scan-row.rev-yellow{background:rgba(255,215,0,0.04);}
+.hook-scan-row.rev-yellow .hsr-port,.hook-scan-row.rev-yellow .hsr-state,.hook-scan-row.rev-yellow .hsr-svc{color:var(--yellow);}
+.hook-scan-row.rev-yellow .hsr-badge{color:var(--yellow);background:rgba(255,215,0,0.08);opacity:1;}
+.hook-count{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;animation:fadeUp 0.4s ease;}
+.count-cell{text-align:center;padding:12px 8px;border-radius:10px;}
+.count-num{font-family:'Rubik',sans-serif;font-weight:900;font-size:32px;line-height:1;}
+.count-lbl{font-size:12px;margin-top:4px;}
+
+/* Q&A within laws */
+.law-qa{margin-top:10px;border:1px solid rgba(30,198,255,0.15);border-radius:8px;overflow:hidden;cursor:pointer;}
+.qa-q{padding:9px 12px;font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;color:var(--accent-hi);display:flex;align-items:center;gap:6px;}
+.qa-a{display:none;padding:9px 12px;font-size:14px;color:var(--text-2);line-height:1.6;border-top:1px solid rgba(30,198,255,0.1);background:rgba(30,198,255,0.03);}
+.qa-a.open{display:block;animation:fadeUp 0.2s ease;}
+
+/* Timer + free text scenario */
+.timer-display{font-family:'Rubik',sans-serif;font-weight:900;font-size:48px;color:var(--accent);text-align:center;padding:10px 0 6px;letter-spacing:3px;line-height:1;transition:color 0.5s;}
+.dec-textarea{width:100%;background:rgba(4,14,28,0.7);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Heebo',sans-serif;font-size:14px;padding:12px 14px;line-height:1.7;resize:none;min-height:90px;outline:none;margin-bottom:10px;direction:rtl;}
+.dec-textarea:focus{border-color:rgba(30,198,255,0.4);}
+.reveal-btn-timer{width:100%;padding:13px;background:rgba(30,198,255,0.04);border:1.5px solid rgba(30,198,255,0.18);border-radius:10px;color:var(--text-3);font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;cursor:not-allowed;transition:all 0.4s;margin-bottom:10px;}
+.reveal-btn-timer:not([disabled]){background:linear-gradient(135deg,var(--accent),var(--accent-str));color:#040E1C;cursor:pointer;box-shadow:0 4px 20px rgba(30,198,255,0.3);}
+.self-rate-wrap{display:flex;gap:10px;margin-top:10px;}
+.self-rate-btn{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--glass);font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;cursor:pointer;color:var(--text-2);transition:all 0.2s;}
+</style>
+</head>
+<body>
+
+<div class="bg-image"></div>
+<div class="bg-grid"></div>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="app">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="unit-header" style="display:flex;align-items:center;justify-content:space-between;">
+    <img src="../../assets/zschool-logo.png" alt="Z-School" style="height:30px;width:auto;mix-blend-mode:screen;">
+    <span class="unit-badge"><span class="badge-dot"></span>יחידה 7 · סייבר</span>
+    <span class="screen-counter" id="screenCounter">1 / 12</span>
+  </div>
+
+  <div class="screens">
+
+  <!-- S0: HOOK -->
+  <div class="screen active" id="s0">
+    <div class="eyebrow">⚡ Mission 07</div>
+    <h2 style="font-size:clamp(18px,4.5vw,22px);line-height:1.3;margin-bottom:14px;">הנה פלט סריקה אמיתי.<br>כמה ממצאים מסוכנים יש כאן?</h2>
+
+    <div class="hook-scan-wrap">
+      <div class="hook-scan-header">PORT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STATE &nbsp;&nbsp; SERVICE</div>
+      <div class="hook-scan-row" id="hsr1"><span class="hsr-port">22/tcp</span><span class="hsr-state">open</span><span class="hsr-svc">ssh</span><span class="hsr-badge" id="hb1"></span></div>
+      <div class="hook-scan-row" id="hsr2"><span class="hsr-port">80/tcp</span><span class="hsr-state">open</span><span class="hsr-svc">http</span><span class="hsr-badge" id="hb2"></span></div>
+      <div class="hook-scan-row" id="hsr3"><span class="hsr-port">23/tcp</span><span class="hsr-state">open</span><span class="hsr-svc">telnet</span><span class="hsr-badge" id="hb3"></span></div>
+      <div class="hook-scan-row" id="hsr4"><span class="hsr-port">3306/tcp</span><span class="hsr-state">open</span><span class="hsr-svc">mysql</span><span class="hsr-badge" id="hb4"></span></div>
+      <div class="hook-scan-row" id="hsr5"><span class="hsr-port">8080/tcp</span><span class="hsr-state">open</span><span class="hsr-svc">http-proxy</span><span class="hsr-badge" id="hb5"></span></div>
+    </div>
+
+    <div id="hook-q" style="text-align:center;margin-top:14px;">
+      <button class="btn btn-primary" onclick="revealHookScan()" style="font-size:15px;padding:13px 32px;">גלו את התשובה ←</button>
+    </div>
+
+    <div id="hook-a" style="display:none;margin-top:14px;">
+      <div class="hook-count">
+        <div class="count-cell" style="background:rgba(255,80,80,0.07);border:1px solid rgba(255,80,80,0.25);">
+          <div class="count-num" style="color:var(--red);">2</div>
+          <div class="count-lbl" style="color:var(--red);">קריטיים 🔴</div>
+        </div>
+        <div class="count-cell" style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.25);">
+          <div class="count-num" style="color:var(--yellow);">1</div>
+          <div class="count-lbl" style="color:var(--yellow);">לבדוק ⚠️</div>
+        </div>
+        <div class="count-cell" style="background:rgba(0,220,120,0.05);border:1px solid rgba(0,220,120,0.25);">
+          <div class="count-num" style="color:var(--green);">2</div>
+          <div class="count-lbl" style="color:var(--green);">תקינים ✓</div>
+        </div>
+      </div>
+      <div class="insight-box">ביחידה הזו תלמדו לזהות בדיוק מה מסוכן כאן ולמה — ותצאו עם ציון אבטחה ודוח שתוכלו להציג.</div>
+    </div>
+  </div>
+
+  <!-- S1: HeyGen -->
+  <div class="screen" id="s1">
+    <div class="eyebrow">סרטון מבוא</div>
+    <h2 style="font-size:18px;margin-bottom:12px;">לפני שמתחילים</h2>
+    <iframe src="https://app.heygen.com/embeds/3a006bf5ea18429ca48904d24d46be12" title="HeyGen video player" frameborder="0" allow="encrypted-media; fullscreen;" allowfullscreen style="width:100%;aspect-ratio:16/9;border-radius:14px;border:1px solid var(--border);display:block;margin-bottom:14px;"></iframe>
+  </div>
+
+  <!-- S2: מה נגלה היום -->
+  <div class="screen" id="s2">
+    <div class="eyebrow">מה נגלה היום</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">בסוף היחידה תדעו:</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">ארבעה כישורים שהופכים אתכם לבוחני אבטחה</p>
+    <div class="obj-list">
+      <div class="obj-item"><div class="obj-num">1</div><div class="obj-text"><strong style="color:var(--text);">לנתח</strong> פלט סריקה ולסמן כל פורט בדרגת סיכון — ירוק / צהוב / אדום</div></div>
+      <div class="obj-item"><div class="obj-num">2</div><div class="obj-text"><strong style="color:var(--text);">להחיל</strong> את 3 חוקי הברזל של זיהוי סיכוני אבטחה</div></div>
+      <div class="obj-item"><div class="obj-num">3</div><div class="obj-text"><strong style="color:var(--text);">לתת ציון אבטחה</strong> לשרת — טוב / בינוני / גרוע — עם נימוק</div></div>
+      <div class="obj-item"><div class="obj-num">4</div><div class="obj-text"><strong style="color:var(--text);">לנסח המלצה</strong> מקצועית: בעיה + סיכון + פתרון + דחיפות</div></div>
+    </div>
+  </div>
+
+  <!-- S3: מקרה 1 — שרת האופיס -->
+  <div class="screen" id="s3">
+    <div class="eyebrow">מקרה 1 — ניתוח מודרך</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">יעקב חשב שהשרת שלו מאובטח</h2>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">יעקב מנהל IT בחברת ייעוץ עם 50 עובדים. "אצלנו הכל בסדר" — הוא אמר. ביקשנו לסרוק. הנה מה שמצאנו. <strong style="color:var(--accent-hi);">לחצו על כל פורט מסומן.</strong></p>
+
+    <div class="ann-wrap">
+      <span class="ann-line" style="color:var(--text-3);">Nmap scan report for server-office-7.local (192.168.1.50)</span>
+      <span class="ann-line" style="color:var(--text-3);">Host is up (0.002s latency). &nbsp;&nbsp;Not shown: 996 closed tcp ports</span>
+      <span class="ann-line" style="color:var(--text-2);">PORT &nbsp;&nbsp; STATE &nbsp;SERVICE</span>
+      <span class="ann-line hl-yellow" onclick="toggleAnn('p1')">21/tcp &nbsp; open &nbsp; ftp</span>
+      <div class="ann-pop" id="p1">🟡 <strong style="color:var(--yellow);">FTP — חדר המשלוחים פתוח לרחוב</strong><br><br>FTP מעביר קבצים בטקסט גלוי — כולל שמות משתמש וסיסמאות. כל מי שברשת יכול "להאזין" לתנועה ולראות כל קובץ שמועלה.<br><br><strong style="color:var(--text);">דחיפות:</strong> בינונית — לעבור ל-SFTP או לסגור.</div>
+      <span class="ann-line hl-green" onclick="toggleAnn('p2')">22/tcp &nbsp; open &nbsp; ssh</span>
+      <div class="ann-pop" id="p2">🟢 <strong style="color:var(--green);">SSH — הדלת האחורית המאובטחת</strong><br><br>גישה מרחוק מוצפנת. זה בדיוק מה שמנהל הרשת צריך. כל עוד הגרסה מעודכנת והסיסמה חזקה — זה תקין.<br><br><strong style="color:var(--text);">מה לבדוק:</strong> האם פתוח לכל האינטרנט או רק לכתובות מוכרות?</div>
+      <span class="ann-line hl-red" onclick="toggleAnn('p3')">23/tcp &nbsp; open &nbsp; telnet</span>
+      <div class="ann-pop" id="p3">🔴 <strong style="color:var(--red);">Telnet — דלת ישנה בלי מנעול לצד דלת חדשה</strong><br><br>גם SSH (22) וגם Telnet (23) פתוחים — שניהם עושים בדיוק אותו דבר. אבל Telnet שולח סיסמאות בטקסט גלוי לחלוטין.<br><br><strong style="color:var(--red);">שני חוקי ברזל נשברו כאן:</strong> כפל שירותים + פרוטוקול לא מוצפן.<br><strong style="color:var(--text);">דחיפות:</strong> מיידית — לסגור Telnet.</div>
+      <span class="ann-line hl-green" onclick="toggleAnn('p4')">80/tcp &nbsp; open &nbsp; http</span>
+      <div class="ann-pop" id="p4">🟢 <strong style="color:var(--green);">HTTP — הכניסה הראשית</strong><br><br>אתר אינטרנט פנימי. ברשת פנימית (192.168.x.x) זה סביר.<br><br><strong style="color:var(--text);">מה לבדוק:</strong> האם יש גם 443 (HTTPS)? אם לא — נתונים עוברים בטקסט גלוי.</div>
+    </div>
+
+    <div class="insight-box red">🔴 <strong style="color:var(--text);">מה אמרנו ליעקב:</strong> "השרת שלך פתוח להאקרים. לא כי הם גאונים — כי Telnet שולח את הסיסמה שלך בטקסט גלוי לכל מי שמאזין ברשת." יעקב סגר את Telnet עוד אותו יום.</div>
+  </div>
+
+  <!-- S4: 3 חוקי הברזל -->
+  <div class="screen" id="s4">
+    <div class="eyebrow">המסגרת לניתוח</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">3 חוקי הברזל</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">לחצו על כל חוק לדוגמה ולמטפורת העיר</p>
+
+    <div class="law-card" onclick="toggleLaw(this)">
+      <div class="law-header">
+        <span class="law-num">1</span>
+        <div>
+          <div class="law-title">כפל שירותים — שתי דלתות לאותו חדר</div>
+          <div style="font-size:13px;color:var(--text-3);margin-top:3px;">אותו שירות, שתי דרכים — אחת חלשה יותר</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="law-body">
+        <div class="law-city">🏙️ בעיר הדיגיטלית:</div>
+        <div class="law-explain">בניין שיש לו שתי דלתות לאותו חדר — אחת ברזל, אחת עץ. התוקף תמיד ינסה את העץ. כפל שירותים מגדיל את שטח הפרצה בלי שום יתרון.</div>
+        <div class="law-example" style="color:var(--yellow);">22/tcp open ssh &nbsp;&nbsp;← בסדר<br><span style="color:var(--red);">23/tcp open telnet ← מיותר + מסוכן</span></div>
+        <div style="font-size:13px;color:var(--text-3);margin-top:8px;">כלל: אם שניהם עושים אותו דבר — סוגרים את החלש.</div>
+        <div class="law-qa" onclick="toggleQA(this)">
+          <div class="qa-q">❓ איך מזהים כפל שירותים בפלט?</div>
+          <div class="qa-a">מחפשים שני פורטים שעושים <em>אותו דבר</em>: 22 + 23 = שניהם גישה מרחוק. 80 + 8080 = שניהם HTTP. כשרואים כפל — שואלים: למה שניהם פתוחים? מה מצדיק את הכפל? לרוב — כלום. סוגרים את החלש.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="law-card" onclick="toggleLaw(this)">
+      <div class="law-header">
+        <span class="law-num">2</span>
+        <div>
+          <div class="law-title">פרוטוקולים לא מוצפנים — מייל פתוח בתיבת דואר ציבורית</div>
+          <div style="font-size:13px;color:var(--text-3);margin-top:3px;">הנתונים עוברים בטקסט גלוי לכל מי שמאזין</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="law-body">
+        <div class="law-city">🏙️ בעיר הדיגיטלית:</div>
+        <div class="law-explain">כמו לשלוח מכתב עם סיסמה בגלוי על המעטפה. כל שליח שנוגע בו — יכול לקרוא. כל מי שברשת יכול "להאזין" לתנועת Telnet ו-FTP ולראות בדיוק מה עובר.</div>
+        <div class="law-example"><span style="color:var(--red);">Telnet (23)</span> <span style="color:var(--text-3);">— הכל גלוי</span><br><span style="color:var(--red);">FTP (21)</span> <span style="color:var(--text-3);">— קבצים וסיסמאות גלויים</span><br><span style="color:var(--green);">SSH (22)</span> <span style="color:var(--text-3);">— מוצפן ✓</span></div>
+        <div style="font-size:13px;color:var(--text-3);margin-top:8px;">כלל: פרוטוקול ישן = לסגור. תמיד יש אלטרנטיבה מאובטחת.</div>
+        <div class="law-qa" onclick="toggleQA(this)">
+          <div class="qa-q">❓ איך יודעים ש-Telnet לא מוצפן?</div>
+          <div class="qa-a">Telnet הומצא ב-1969 — שנים לפני שהמציאו הצפנה לתקשורת. הפרוטוקול שולח כל בית נתונים "גלוי" ברשת. כלי כמו Wireshark יכול להאזין ולהציג כל מה שעובר — כולל הסיסמה — בטקסט נקי. SSH הומצא ב-1995 בדיוק כדי לפתור את הבעיה הזו.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="law-card" onclick="toggleLaw(this)">
+      <div class="law-header">
+        <span class="law-num">3</span>
+        <div>
+          <div class="law-title">דלתות ניהול פתוחות לרחוב — המנהל מקבל אורחים לא רצויים</div>
+          <div style="font-size:13px;color:var(--text-3);margin-top:3px;">פורטי גישה לשרת נגישים מכל מקום</div>
+        </div>
+        <i data-lucide="chevron-down" width="16" height="16" style="color:var(--text-3);margin-right:auto;flex-shrink:0;"></i>
+      </div>
+      <div class="law-body">
+        <div class="law-city">🏙️ בעיר הדיגיטלית:</div>
+        <div class="law-explain">כניסת מנהלים של בניין — אמורה להיות נגישה רק לעובדים. אם כל עובר אורח יכול לדפוק על הדלת הזו ולנסות להיכנס — זו בעיה גדולה. תוקפים מריצים brute-force על SSH פתוח לאינטרנט.</div>
+        <div class="law-example"><span style="color:var(--red);">22/tcp open ssh ← פתוח לכל האינטרנט</span><br><span style="color:var(--green);">22/tcp open ssh ← פתוח רק מ-192.168.x.x ✓</span></div>
+        <div style="font-size:13px;color:var(--text-3);margin-top:8px;">כלל: פורטי ניהול — firewall מגביל גישה לכתובות מוכרות בלבד.</div>
+        <div class="law-qa" onclick="toggleQA(this)">
+          <div class="qa-q">❓ איך יודעים אם דלת ניהול פתוחה לכולם?</div>
+          <div class="qa-a">אם הסריקה מגיעה מרשת חיצונית (כתובת IP ציבורית) ומקבלת תגובה — הדלת פתוחה לכולם. אם הסריקה מגיעה מהרשת הפנימית (192.168.x.x) בלבד — יש firewall שמגן. בסריקת בדיקה: מריצים מבחוץ ומבפנים ומשווים את התוצאות.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5: מקרה 2 — קופת בית הקפה -->
+  <div class="screen" id="s5">
+    <div class="eyebrow">מקרה 2 — תרחיש אמיתי</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">בית הקפה שחשף כרטיסי אשראי לכל הלקוחות שלו</h2>
+    <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">אביאל פתח בית קפה ב-2022. קופת האשראי שלו מחוברת לאותו WiFi שהלקוחות גולשים עליו. חבר שלו עשה סריקה ב-5 דקות וחייג אליו בדחיפות. <strong style="color:var(--accent-hi);">לחצו על כל ממצא לגלות מה חשף.</strong></p>
+
+    <div class="ann-wrap">
+      <span class="ann-line" style="color:var(--text-3);">Nmap scan report for pos-terminal-coffee.lan (192.168.1.15)</span>
+      <span class="ann-line" style="color:var(--text-3);">Host is up. &nbsp;Not shown: 997 closed tcp ports</span>
+      <span class="ann-line" style="color:var(--text-2);">PORT &nbsp;&nbsp;&nbsp;&nbsp; STATE &nbsp;SERVICE</span>
+      <span class="ann-line hl-red" onclick="toggleAnn('c1')">22/tcp &nbsp;&nbsp; open &nbsp; ssh</span>
+      <div class="ann-pop" id="c1">🔴 <strong style="color:var(--red);">דגל אדום 1: דלת הניהול פתוחה לכולם</strong><br><br>קופת האשראי ברשת הציבורית של הלקוחות. כל מי שיושב בבית הקפה עם לפטופ יכול לנסות להיכנס לקופה דרך SSH.<br><br>תוקף ינסה brute-force — אלפי סיסמאות בדקה.</div>
+      <span class="ann-line hl-red" onclick="toggleAnn('c2')">80/tcp &nbsp;&nbsp; open &nbsp; http</span>
+      <div class="ann-pop" id="c2">🔴 <strong style="color:var(--red);">דגל אדום 2: ממשק ניהול ב-HTTP רגיל</strong><br><br>למה לקופה יש אתר אינטרנט? ככל הנראה — ממשק ניהול שמציג דוחות מכירות.<br><br>אם הסיסמה היא admin123 — כל לקוח בבית הקפה יכול לראות את כל נתוני כרטיסי האשראי.</div>
+      <span class="ann-line hl-red" onclick="toggleAnn('c3')">8080/tcp open &nbsp; http-proxy</span>
+      <div class="ann-pop" id="c3">🔴 <strong style="color:var(--red);">דגל אדום 3: שרת ניהול משני חשוף</strong><br><br>פורט 8080 = "הכניסה האחורית לממשקי ניהול". לעתים קרובות ללא הצפנה ועם סיסמה ברירת מחדל.<br><br>שלושה ממשקים פתוחים על קופת אשראי ברשת ציבורית = כשל אבטחה מלא.</div>
+    </div>
+
+    <div class="card-red card">
+      <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--red);margin-bottom:8px;font-size:14px;">🔴 ציון אבטחה: גרוע — סכנה מיידית לנתוני לקוחות</div>
+      <div style="font-size:14px;color:var(--text-2);line-height:1.7;">אביאל לא ידע שכל מי שיושב עם לפטופ בבית הקפה שלו יכול לנסות לגשת לקופה. חבר שלו ישב ב-5 דקות, הריץ סריקה, וראה שלושה ממצאים קריטיים ברצף.<br><br><strong style="color:var(--text);">מה עשינו:</strong> הפרדנו את הרשתות, חסמנו 22 ו-8080 לגישה חיצונית, וחיזקנו את הסיסמאות. 45 דקות עבודה — קופת אשראי מאובטחת.</div>
+    </div>
+  </div>
+
+  <!-- S6: ציון אבטחה -->
+  <div class="screen" id="s6">
+    <div class="eyebrow">המסגרת לדירוג</div>
+    <h2 style="font-size:20px;margin-bottom:6px;">ציון אבטחה — 3 רמות</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">כמו דוח מפקח בטיחות על הבניין</p>
+
+    <div class="score-grid">
+      <div class="score-card good">
+        <div class="score-icon">🟢</div>
+        <div class="score-label">טוב</div>
+        <div class="score-criteria">רק פורטים הכרחיים פתוחים. כל השאר — closed / filtered. שירותים מעודכנים.</div>
+      </div>
+      <div class="score-card medium">
+        <div class="score-icon">🟡</div>
+        <div class="score-label">בינוני</div>
+        <div class="score-criteria">פורטי ניהול פתוחים (22) אבל מאובטחים. יש מה לשפר אך לא סכנה מיידית.</div>
+      </div>
+      <div class="score-card bad">
+        <div class="score-icon">🔴</div>
+        <div class="score-label">גרוע</div>
+        <div class="score-criteria">פרוטוקולים ישנים (23, 21). מסד נתונים חשוף (3306). כפל שירותים.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+      <div class="card card-green" style="margin-bottom:0;">
+        <div style="font-family:'Courier New',monospace;font-size:13px;direction:ltr;margin-bottom:6px;color:var(--green);">80/tcp open http ← רק מה שצריך<br>443/tcp open https</div>
+        <div style="font-size:13px;color:var(--text-3);">שרת אינטרנט שחושף רק את מה שצריך. ציון: 🟢 טוב</div>
+      </div>
+      <div class="card card-yellow" style="margin-bottom:0;">
+        <div style="font-family:'Courier New',monospace;font-size:13px;direction:ltr;margin-bottom:6px;color:var(--yellow);">22/tcp open ssh<br>80/tcp open http<br>443/tcp open https</div>
+        <div style="font-size:13px;color:var(--text-3);">SSH פתוח — לגיטימי אם מאובטח. ציון: 🟡 בינוני</div>
+      </div>
+      <div class="card card-red" style="margin-bottom:0;">
+        <div style="font-family:'Courier New',monospace;font-size:13px;direction:ltr;margin-bottom:6px;color:var(--red);">21/tcp open ftp<br>23/tcp open telnet<br>3306/tcp open mysql</div>
+        <div style="font-size:13px;color:var(--text-3);">שלושה ממצאים קריטיים. ציון: 🔴 גרוע</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7: ממצא → המלצה -->
+  <div class="screen" id="s7">
+    <div class="eyebrow">כיצד מדווחים</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">ממצא → המלצה מקצועית</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:12px;">בוחן אבטחה לא רק אומר "יש בעיה" — הוא מסביר מה, למה, ומה עושים</p>
+
+    <div style="font-size:14px;color:var(--text-2);margin-bottom:10px;font-family:'Rubik',sans-serif;font-weight:700;">תבנית ההמלצה:</div>
+    <div class="rec-card">
+      <div class="rec-row"><span class="rec-label">ממצא</span><span class="rec-val">מה מצאתם — פורט + שירות + מצב</span></div>
+      <div class="rec-row"><span class="rec-label">סיכון</span><span class="rec-val">מה יכול לקרות אם לא מתקנים — בשפה ברורה</span></div>
+      <div class="rec-row"><span class="rec-label">המלצה</span><span class="rec-val">מה לעשות — פעולה ספציפית ומדידה</span></div>
+      <div class="rec-row"><span class="rec-label">דחיפות</span><span class="rec-val">🔴 מיידי / 🟡 תוך שבוע / 🟢 בתחזוקה הבאה</span></div>
+    </div>
+
+    <div style="font-size:14px;color:var(--text-2);margin-bottom:10px;font-family:'Rubik',sans-serif;font-weight:700;">דוגמה — ממצא Telnet:</div>
+    <div class="rec-card">
+      <div class="rec-row"><span class="rec-label">ממצא</span><span class="rec-val">23/tcp open telnet — גישה מרחוק לא מוצפנת פעילה לצד SSH (22)</span></div>
+      <div class="rec-row" style="border-right:3px solid var(--red);"><span class="rec-label" style="color:var(--red);">סיכון</span><span class="rec-val">כל מי שברשת יכול לראות סיסמאות בטקסט גלוי בזמן אמת</span></div>
+      <div class="rec-row"><span class="rec-label">המלצה</span><span class="rec-val">לכבות את שירות Telnet ולוודא שכל הגישה מרחוק עוברת דרך SSH (22) בלבד</span></div>
+      <div class="rec-row"><span class="rec-label">דחיפות</span><span class="rec-val">🔴 מיידי — לפני סוף היום</span></div>
+    </div>
+  </div>
+
+  <!-- S8: פעילות עצמאית -->
+  <div class="screen" id="s8">
+    <div class="eyebrow">פעילות — נתחו לבד</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">שרת של חנות בגדים</h2>
+    <p style="font-size:14px;color:var(--text-3);margin-bottom:12px;">לחצו על כל פורט — זהו את הבעיה לפני שמתגלה ההסבר</p>
+
+    <div style="font-family:'Courier New',monospace;font-size:13px;direction:ltr;color:var(--text-3);background:rgba(4,14,28,0.7);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px;">
+      Nmap scan report for clothes-store.lan (192.168.1.20)<br>
+      Not shown: 997 closed tcp ports<br>
+      PORT &nbsp;&nbsp; STATE &nbsp;SERVICE
+    </div>
+
+    <div id="ind-ports">
+      <div class="port-row" onclick="revealPort(this,'yellow','🟡','FTP — העברת קבצים בטקסט גלוי. לא מוצפן — סיסמאות וקבצים נחשפים לכל מי שמאזין ברשת. אלטרנטיבה: SFTP מוצפן.')">
+        <span class="port-num-badge" style="color:var(--yellow);">21/tcp</span>
+        <span class="port-name-badge">FTP</span>
+        <span class="port-detail" id="d1"></span>
+        <span class="click-hint">← לחץ לניתוח</span>
+        <span class="port-risk" id="r1"></span>
+      </div>
+      <div class="port-row" onclick="revealPort(this,'red','🔴','Telnet — גישה מרחוק לא מוצפנת. SSH (אם היה קיים) היה עושה בדיוק אותו דבר בצורה בטוחה. זהו כישלון כפול: פרוטוקול ישן + אין אלטרנטיבה מאובטחת.')">
+        <span class="port-num-badge" style="color:var(--red);">23/tcp</span>
+        <span class="port-name-badge">Telnet</span>
+        <span class="port-detail" id="d2"></span>
+        <span class="click-hint">← לחץ לניתוח</span>
+        <span class="port-risk" id="r2"></span>
+      </div>
+      <div class="port-row" onclick="revealPort(this,'green','🟢','HTTP — אתר אינטרנט רגיל. ברשת פנימית זה סביר. לאינטרנט ציבורי — כדאי לוודא שיש גם HTTPS (443).')">
+        <span class="port-num-badge" style="color:var(--green);">80/tcp</span>
+        <span class="port-name-badge">HTTP</span>
+        <span class="port-detail" id="d3"></span>
+        <span class="click-hint">← לחץ לניתוח</span>
+        <span class="port-risk" id="r3"></span>
+      </div>
+    </div>
+
+    <div id="ind-result" style="display:none;">
+      <div class="card-red card" style="margin-top:4px;">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--red);margin-bottom:8px;">ציון אבטחה: 🔴 גרוע</div>
+        <div style="font-size:14px;color:var(--text-2);line-height:1.7;">
+          <strong style="color:var(--text);">2 ממצאים קריטיים:</strong><br>
+          פורט 21 (FTP) — לעבור ל-SFTP<br>
+          פורט 23 (Telnet) — לסגור מיד ולהוסיף SSH (22)<br><br>
+          <strong style="color:var(--text);">אם חנות הבגדים עובדת עם כרטיסי אשראי</strong> — חייבים לתקן לפני סוף היום.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S9: תרחיש החלטה עם טיימר -->
+  <div class="screen" id="s9">
+    <div class="eyebrow">תרחיש החלטה</div>
+    <h2 style="font-size:18px;margin-bottom:6px;">כתבו את הדוח שלכם</h2>
+    <p style="font-size:14px;color:var(--text-2);margin-bottom:10px;">קיבלתם את הפלט הבא. יש לכם דקה לנתח ולכתוב בשורות הבאות: מה הממצאים, מה מסוכן, ומה המלצתכם.</p>
+
+    <div class="ann-wrap" style="margin-bottom:10px;">
+      <span class="ann-line" style="color:var(--text-3);">PORT &nbsp;&nbsp;&nbsp;&nbsp; STATE &nbsp; SERVICE</span>
+      <span class="ann-line" style="color:var(--green);">22/tcp &nbsp;&nbsp; open &nbsp;&nbsp; ssh</span>
+      <span class="ann-line" style="color:var(--green);">80/tcp &nbsp;&nbsp; open &nbsp;&nbsp; http</span>
+      <span class="ann-line" style="color:var(--red);">23/tcp &nbsp;&nbsp; open &nbsp;&nbsp; telnet</span>
+      <span class="ann-line" style="color:var(--red);">3306/tcp open &nbsp;&nbsp; mysql</span>
+      <span class="ann-line" style="color:var(--yellow);">8080/tcp open &nbsp;&nbsp; http-proxy</span>
+    </div>
+
+    <div id="timer-display" class="timer-display">01:00</div>
+
+    <textarea id="dec-text" class="dec-textarea" placeholder="כתבו כאן את הניתוח שלכם: אילו פורטים מסוכנים? למה? מה המלצתכם?"></textarea>
+
+    <button id="reveal-answer-btn" class="reveal-btn-timer" disabled onclick="showDecAnswer()">
+      הצג תשובה — זמין בעוד <span id="timer-btn-txt">60</span> שניות
+    </button>
+
+    <div id="dec-answer" style="display:none;">
+      <div class="card-red card" style="margin-bottom:10px;">
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;color:var(--red);margin-bottom:8px;">ניתוח מקצועי:</div>
+        <div style="font-size:14px;color:var(--text-2);line-height:1.7;">
+          🔴 <strong style="color:var(--text);">23/tcp (Telnet)</strong> — קריטי. SSH (22) כבר פתוח ועושה אותו דבר. Telnet מוסיף סיכון ללא יתרון.<br>
+          🔴 <strong style="color:var(--text);">3306/tcp (MySQL)</strong> — קריטי. מסד נתונים לא אמור להיות נגיש מחוץ לשרת.<br>
+          🟡 <strong style="color:var(--text);">8080/tcp</strong> — לבדוק מה רץ שם ולהגביל גישה.<br>
+          🟢 22 ו-80 — תקינים בתנאי שמאובטחים.<br><br>
+          <strong style="color:var(--text);">ציון אבטחה: 🔴 גרוע.</strong> שני ממצאים קריטיים — לסגור לפני סוף היום.
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text-2);margin-bottom:10px;font-family:'Rubik',sans-serif;font-weight:700;">האם הדוח שלכם כלל את הממצאים העיקריים?</p>
+      <div class="self-rate-wrap">
+        <button class="self-rate-btn yes" onclick="selfRate(true)">כן, זיהיתי את רובם ✓</button>
+        <button class="self-rate-btn no" onclick="selfRate(false)">לא, פספסתי משהו ✗</button>
+      </div>
+      <div id="self-result" style="display:none;margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- S10: Quiz -->
+  <div class="screen" id="s10">
+    <div class="eyebrow">בוחן</div>
+    <h2 style="font-size:18px;margin-bottom:14px;">בדקו את עצמכם</h2>
+
+    <div class="mc-block">
+      <div class="mc-q">1. שרת מחזיר: 22/tcp open ssh ו-23/tcp open telnet. איזה חוק ברזל מופר?</div>
+      <div class="mc-options" id="q1o">
+        <div class="mc-opt" onclick="answerQ(1,this,false)">רק חוק 3 — דלתות ניהול פתוחות לכולם</div>
+        <div class="mc-opt" onclick="answerQ(1,this,true)">חוק 1 וחוק 2 — כפל שירותים + פרוטוקול לא מוצפן</div>
+        <div class="mc-opt" onclick="answerQ(1,this,false)">חוק 2 בלבד — Telnet לא מוצפן</div>
+      </div>
+      <div class="mc-feedback" id="fb1"></div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">2. סריקה מחזירה 3306/tcp open mysql. מה ציון האבטחה ולמה?</div>
+      <div class="mc-options" id="q2o">
+        <div class="mc-opt" onclick="answerQ(2,this,false)">🟡 בינוני — MySQL פתוח אבל לא מסוכן כשלעצמו</div>
+        <div class="mc-opt" onclick="answerQ(2,this,false)">🟢 טוב — מסד נתונים פתוח הוא דבר תקין</div>
+        <div class="mc-opt" onclick="answerQ(2,this,true)">🔴 גרוע — מסד נתונים אסור שיהיה נגיש מחוץ לשרת עצמו</div>
+      </div>
+      <div class="mc-feedback" id="fb2"></div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">3. בוחן אבטחה מצא FTP (21) פתוח. מה ההמלצה הנכונה?</div>
+      <div class="mc-options" id="q3o">
+        <div class="mc-opt" onclick="answerQ(3,this,false)">לסגור את פורט 21 ולפתוח פורט 22 במקומו</div>
+        <div class="mc-opt" onclick="answerQ(3,this,true)">לעבור ל-SFTP (מוצפן) ולסגור FTP — אותה פונקציה, ללא חשיפת נתונים</div>
+        <div class="mc-opt" onclick="answerQ(3,this,false)">לשנות את הסיסמה של FTP לסיסמה חזקה יותר</div>
+      </div>
+      <div class="mc-feedback" id="fb3"></div>
+    </div>
+
+    <div id="quiz-done" style="display:none;">
+      <div class="check-success">✅ עברתם את הבוחן. עכשיו אתם מדברים בשפה של בוחני אבטחה.</div>
+    </div>
+  </div>
+
+  <!-- S11: Summary -->
+  <div class="screen" id="s11">
+    <div class="eyebrow">סיכום</div>
+    <h2 style="font-size:18px;margin-bottom:14px;">מה למדנו ביחידה 7</h2>
+    <div class="summary-points">
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>ניתוח פלט = שלוש שאלות:</strong> מה פתוח? האם זה הכרחי? האם זה מוצפן?</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>3 חוקי הברזל:</strong> כפל שירותים / פרוטוקולים ישנים / ניהול פתוח לכולם. הפרה אחת = ממצא. שתיים = דחוף. שלוש = קריטי.</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>ציון אבטחה:</strong> 🟢 רק הכרחי + מוצפן. 🟡 פורטי ניהול אבל מאובטחים. 🔴 פרוטוקולים ישנים / חשיפת מסד נתונים.</div></div>
+      <div class="summary-point"><div class="sp-icon"><i data-lucide="check-circle" width="20" height="20"></i></div><div class="sp-text"><strong>המלצה מקצועית:</strong> ממצא + סיכון + פעולה + דחיפות. בלי כל ארבעה — זה לא המלצה אמיתית.</div></div>
+    </div>
+    <div class="next-card">
+      <div class="next-icon"><i data-lucide="arrow-left-circle" width="20" height="20"></i></div>
+      <div>
+        <div class="next-label">יחידה הבאה</div>
+        <div class="next-text"><strong style="color:var(--text);">יחידה 8 — הגנה, אתיקה וסיכום</strong><br>מצאנו את הבעיות — עכשיו נסגור את הדלתות. netstat, taskkill, firewall, וקווים האדומים של הסייבר.</div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /screens -->
+
+  <div class="dots" id="dotNav"></div>
+  <div class="nav">
+    <button class="btn btn-back" id="btnBack" onclick="navigate(-1)" style="display:none;">הקודם →</button>
+    <button class="btn btn-primary" id="btnNext" onclick="navigate(1)">← הבא</button>
+  </div>
+</div>
+
+<script>
+var scormAPI=null;
+function findAPI(w){var t=0;while(!w.API&&w.parent&&w.parent!==w&&t<7){w=w.parent;t++;}return w.API||null;}
+try{scormAPI=findAPI(window);}catch(e){}
+function scormSet(k,v){try{if(scormAPI)scormAPI.LMSSetValue(k,v);}catch(e){}}
+function scormInit(){try{if(scormAPI){scormAPI.LMSInitialize('');scormSet('cmi.core.lesson_status','incomplete');}}catch(e){}}
+function scormComplete(){try{if(scormAPI){scormSet('cmi.core.lesson_status','completed');scormSet('cmi.core.score.raw','100');scormAPI.LMSCommit('');scormAPI.LMSFinish('');}}catch(e){}}
+scormInit();
+
+var UNIT_ID=7, UNIT_XP=200;
+function completeAndReturn(){
+  scormComplete();
+  try{
+    var u=localStorage.getItem('cp_current');
+    if(u){
+      var users=JSON.parse(localStorage.getItem('cp_users')||'{}');
+      var d=users[u];
+      if(d&&!d.completedUnits.includes(UNIT_ID)){
+        d.completedUnits.push(UNIT_ID);
+        d.xp=(d.xp||0)+UNIT_XP;
+        localStorage.setItem('cp_users',JSON.stringify(users));
+      }
+    }
+  }catch(e){}
+  window.location.href='../../index.html';
+}
+
+var TOTAL=12,current=0;
+var pFill=document.getElementById('progressFill');
+var btnBack=document.getElementById('btnBack');
+var btnNext=document.getElementById('btnNext');
+var counter=document.getElementById('screenCounter');
+
+function buildDots(){
+  var nav=document.getElementById('dotNav');
+  for(var i=0;i<TOTAL;i++){
+    var d=document.createElement('button');
+    d.className='dot'+(i===0?' active':'');
+    (function(idx){d.onclick=function(){goToScreen(idx);};})(i);
+    nav.appendChild(d);
+  }
+}
+function updateNav(){
+  btnBack.style.display=current===0?'none':'block';
+  btnNext.textContent=current===TOTAL-1?'סיום ✓':'← הבא';
+  pFill.style.width=((current+1)/TOTAL*100)+'%';
+  counter.textContent=(current+1)+' / '+TOTAL;
+  document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===current);});
+}
+function goToScreen(n){
+  if(n<0||n>=TOTAL||n===current)return;
+  var prev=document.getElementById('s'+current);
+  var nxt=document.getElementById('s'+n);
+  prev.classList.add('exit');prev.classList.remove('active');
+  setTimeout(function(){prev.classList.remove('exit');nxt.classList.add('active');current=n;updateNav();if(n===9)startDecTimer();},220);
+}
+function navigate(dir){
+  if(dir===1&&current===TOTAL-1){completeAndReturn();return;}
+  goToScreen(current+dir);
+}
+buildDots();
+updateNav();
+
+function toggleAnn(id){var el=document.getElementById(id);if(el)el.classList.toggle('show');}
+function revealHookScan(){
+  document.getElementById('hook-q').style.display='none';
+  var rows=[
+    ['hsr1','green','✓ בסדר','hb1'],
+    ['hsr2','green','✓ בסדר','hb2'],
+    ['hsr3','red','🔴 קריטי','hb3'],
+    ['hsr4','red','🔴 קריטי','hb4'],
+    ['hsr5','yellow','⚠ לבדוק','hb5']
+  ];
+  rows.forEach(function(r,i){
+    setTimeout(function(){
+      var row=document.getElementById(r[0]);
+      if(row)row.classList.add('rev-'+r[1]);
+      var badge=document.getElementById(r[3]);
+      if(badge)badge.textContent=r[2];
+    },i*180);
+  });
+  setTimeout(function(){document.getElementById('hook-a').style.display='block';},rows.length*180+200);
+}
+function toggleLaw(card){var body=card.querySelector('.law-body');body.classList.toggle('open');}
+function toggleQA(el){var a=el.querySelector('.qa-a');a.classList.toggle('open');}
+
+// Timer + free text scenario
+var timerStarted=false, timerInterval=null;
+function startDecTimer(){
+  if(timerStarted)return;
+  timerStarted=true;
+  var secs=60;
+  var display=document.getElementById('timer-display');
+  var btn=document.getElementById('reveal-answer-btn');
+  var txt=document.getElementById('timer-btn-txt');
+  timerInterval=setInterval(function(){
+    secs--;
+    var m=Math.floor(secs/60);
+    var s=secs%60;
+    var str=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(display)display.textContent=str;
+    if(txt)txt.textContent=secs;
+    if(secs<=0){
+      clearInterval(timerInterval);
+      if(display){display.textContent='00:00';display.style.color='var(--green)';}
+      if(btn){btn.disabled=false;btn.textContent='הצג תשובה ←';}
+    }
+  },1000);
+}
+function showDecAnswer(){
+  document.getElementById('reveal-answer-btn').style.display='none';
+  document.getElementById('dec-answer').style.display='block';
+}
+function selfRate(good){
+  var el=document.getElementById('self-result');
+  el.style.display='block';
+  if(good){
+    el.innerHTML='<div class="check-success">✅ מצוין! זיהוי שני ממצאים קריטיים ויכולת לנמק אותם — זה בדיוק מה שמצפים מבוחן אבטחה.</div>';
+  } else {
+    el.innerHTML='<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:10px;padding:12px;font-size:14px;color:var(--text-2);line-height:1.6;">לא נורא — זה מה שהלמידה היא. חזרו לסקור את 3 חוקי הברזל ואת הניתוחים המודרכים. עם תרגול זה הופך לאוטומטי.</div>';
+  }
+}
+
+// Independent activity
+var revealedCount=0;
+function revealPort(row,color,emoji,text){
+  if(row.classList.contains('revealed-'+color))return;
+  row.classList.add('revealed-'+color);
+  var clickHint=row.querySelector('.click-hint');
+  if(clickHint)clickHint.style.display='none';
+  var detail=row.querySelector('.port-detail');
+  var risk=row.querySelector('.port-risk');
+  if(detail){detail.textContent=text;detail.classList.add('show');}
+  if(risk)risk.textContent=emoji;
+  row.onclick=null;
+  revealedCount++;
+  if(revealedCount>=3){
+    document.getElementById('ind-result').style.display='block';
+  }
+}
+
+// Decision scenario (legacy — replaced by timer)
+var dec1Done=false, dec2Done=false;
+function decideDec(btn,q,isRight){
+  if(q===1&&dec1Done)return;
+  if(q===2&&dec2Done)return;
+  var container=document.getElementById('dec'+q);
+  var opts=Array.from(container.querySelectorAll('.dec-option'));
+  opts.forEach(function(o){o.style.pointerEvents='none';});
+  var res=document.getElementById('dec'+q+'-res');
+  if(isRight){
+    btn.classList.add('chosen-right');
+    res.className='dec-result ok show';
+    if(q===1){
+      res.innerHTML='✅ <strong style="color:var(--green)">נכון.</strong> Telnet (23) ו-MySQL (3306) פתוחים יחד הם שני ממצאים קריטיים. פורט 80 תקין. פורט 8080 ייבדק — אבל לא ראשון.';
+      dec1Done=true;
+      setTimeout(function(){document.getElementById('dec2').style.display='block';},600);
+    } else {
+      res.innerHTML='✅ <strong style="color:var(--green)">בדיוק.</strong> זהו חוק ברזל מספר 1: כפל שירותים. SSH ו-Telnet עושים אותו דבר — Telnet חלש יותר, ולכן סוגרים אותו.';
+      dec2Done=true;
+      setTimeout(function(){document.getElementById('dec-done').style.display='block';},600);
+    }
+  } else {
+    btn.classList.add('chosen-wrong');
+    opts.forEach(function(o){if(o.onclick===null&&!o.classList.contains('chosen-wrong'))o.classList.add('reveal-right');});
+    res.className='dec-result err show';
+    if(q===1){
+      res.innerHTML='✗ פורט 80 עובד — זה <em>תקין</em>. פורט 8080 חשוד — אבל לא קריטי. הממצאים הקריטיים הם Telnet (23) ו-MySQL (3306). <strong style="color:var(--text);">קריטי קודם.</strong>';
+      dec1Done=true;
+      setTimeout(function(){document.getElementById('dec2').style.display='block';},800);
+    } else {
+      res.innerHTML='✗ הוספת סיסמה ל-Telnet לא עוזרת — הנתונים עדיין עוברים בטקסט גלוי. SSH קיים ועושה בדיוק אותו דבר בצורה מאובטחת. <strong style="color:var(--text);">Telnet מיותר.</strong>';
+      dec2Done=true;
+      setTimeout(function(){document.getElementById('dec-done').style.display='block';},800);
+    }
+  }
+}
+
+// Quiz
+var done={1:false,2:false,3:false};
+var correctIdx={1:1,2:2,3:1};
+function answerQ(q,btn,isCorrect){
+  if(done[q])return;
+  done[q]=true;
+  var opts=Array.from(document.getElementById('q'+q+'o').querySelectorAll('.mc-opt'));
+  opts.forEach(function(o){o.style.pointerEvents='none';});
+  var fb=document.getElementById('fb'+q);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='mc-feedback ok';
+    fb.innerHTML={
+      1:'✓ נכון! חוק 1 (כפל — שני שירותים לאותו חדר) + חוק 2 (Telnet לא מוצפן). שני חוקים = ממצא דחוף.',
+      2:'✓ בדיוק. מסד נתונים פתוח לרשת = כל תוקף יכול לנסות סיסמאות. ממצא קריטי.',
+      3:'✓ נכון! SFTP = FTP מוצפן. אותה פונקציה, ללא חשיפת נתונים. לא מספיק לסגור פורט — צריך חלופה.'
+    }[q];
+  } else {
+    btn.classList.add('wrong');
+    opts[correctIdx[q]].classList.add('reveal');
+    fb.className='mc-feedback err';
+    fb.innerHTML={
+      1:'✗ שני שירותים לאותו חדר = חוק 1. ו-Telnet לא מוצפן = חוק 2. שניהם מופרים.',
+      2:'✗ MySQL פתוח = סכנה קריטית. מסד נתונים לא אמור להיות נגיש מחוץ לשרת עצמו.',
+      3:'✗ סיסמה חזקה ל-FTP לא עוזרת — הנתונים עדיין עוברים בגלוי. צריך SFTP (מוצפן).'
+    }[q];
+  }
+  if(done[1]&&done[2]&&done[3]){
+    document.getElementById('quiz-done').style.display='block';
+    scormComplete();
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

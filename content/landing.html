@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberPath — קורס סייבר לנוער | Z-School</title>
+<meta name="description" content="קורס סייבר אינטראקטיבי לנוער גילאי 13–18. 8 יחידות, וידאו + סימולטור טרמינל, ללא ידע קודם. 199 ₪ בלבד.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050d18;
+    --bg2: #0a1628;
+    --accent: #00e5ff;
+    --accent2: #7b2fff;
+    --green: #00ff9d;
+    --text: #ffffff;
+    --text-dim: #94b0cc;
+    --border: rgba(0,229,255,0.12);
+    --card: rgba(10,22,40,0.85);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    direction: rtl;
+  }
+
+  #network-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 600px; height: 600px; background: rgba(0,229,255,0.05); top: -200px; right: -150px; }
+  .orb-2 { width: 500px; height: 500px; background: rgba(123,47,255,0.07); bottom: 200px; left: -150px; }
+
+  section { position: relative; z-index: 1; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(5,13,24,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    direction: ltr;
+  }
+  .logo span { color: var(--text-dim); }
+
+  .nav-logo {
+    height: 48px;
+    width: auto;
+    vertical-align: middle;
+  }
+
+  nav a.btn-nav {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: 'Heebo', sans-serif;
+  }
+  nav a.btn-nav:hover { background: rgba(0,229,255,0.1); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    background: linear-gradient(rgba(5,13,24,0.55) 0%, rgba(5,13,24,0.82) 100%),
+                url('assets/icons/unit-01/cyber-networks-course-background.png') center/cover no-repeat;
+  }
+
+  /* Terminal */
+  .terminal-anim {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--green);
+    margin-bottom: 32px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(0,255,157,0.25);
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: left;
+    direction: ltr;
+    width: 340px;
+    min-height: 88px;
+    box-shadow: 0 0 24px rgba(0,255,157,0.07);
+  }
+  .t-line { display: block; line-height: 1.9; }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--green);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink-cur 0.7s infinite;
+  }
+  @keyframes blink-cur {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.15;
+    max-width: 800px;
+    margin-bottom: 20px;
+    color: #ffffff;
+  }
+  .hero h1 .highlight {
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(0,229,255,0.45);
+  }
+
+  .hero p.sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #c8dff5;
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #050d18;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 14px 36px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+    box-shadow: 0 0 24px rgba(0,229,255,0.25);
+  }
+  .btn-primary:hover {
+    background: #33ecff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 36px rgba(0,229,255,0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    font-size: 1rem;
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-video {
+    width: 100%;
+    max-width: 640px;
+    margin-top: 8px;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 0 40px rgba(0,229,255,0.12);
+    aspect-ratio: 16/9;
+  }
+  .hero-video iframe { width: 100%; height: 100%; display: block; }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 64px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+  }
+  .stat-label { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header { text-align: center; margin-bottom: 56px; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.25;
+    color: #ffffff;
+  }
+  .section-header p { color: var(--text-dim); margin-top: 12px; font-size: 1rem; line-height: 1.6; }
+
+  /* ── SKILLS — purple tint ── */
+  .skills-section {
+    padding: 100px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .skills-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(123,47,255,0.09) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    perspective: 1200px;
+  }
+
+  .skill-card {
+    background: rgba(20,10,40,0.7);
+    border: 1px solid rgba(123,47,255,0.22);
+    border-radius: 12px;
+    padding: 28px;
+    transition: transform 0.35s ease, border-color 0.2s, box-shadow 0.35s;
+    transform-style: preserve-3d;
+    position: relative;
+    z-index: 1;
+  }
+  .skill-card:hover {
+    border-color: rgba(123,47,255,0.55);
+    transform: rotateX(5deg) rotateY(-4deg) translateY(-6px);
+    box-shadow: 0 24px 48px rgba(123,47,255,0.18), 0 0 0 1px rgba(123,47,255,0.2);
+  }
+  .skill-icon { font-size: 1.8rem; margin-bottom: 14px; display: block; }
+  .skill-icon-svg { width: 52px; height: 52px; margin-bottom: 14px; display: block; }
+  .skill-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: #00e5ff; }
+  .skill-card p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── UNITS — teal tint ── */
+  .units-section {
+    padding: 100px 40px;
+    background: linear-gradient(160deg, #050d18 0%, #061b22 60%, #071e28 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .units-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at bottom left, rgba(0,180,216,0.09) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .units-section .section-label { color: #00e5ff; }
+
+  .units-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Network path */
+  .network-path {
+    position: relative;
+    padding: 10px 0;
+  }
+
+  .network-spine {
+    position: absolute;
+    left: 50%;
+    top: 22px; bottom: 22px;
+    width: 2px;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, transparent, #00e5ff 5%, #00e5ff 95%, transparent);
+    box-shadow: 0 0 10px rgba(0,229,255,0.8), 0 0 24px rgba(0,229,255,0.35);
+    z-index: 1;
+  }
+
+  .net-unit {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .net-spacer { flex: 1; }
+
+  .net-node {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: #050d18;
+    border: 2px solid #00e5ff;
+    box-shadow: 0 0 14px rgba(0,229,255,0.9), 0 0 30px rgba(0,229,255,0.4), inset 0 0 8px rgba(0,229,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #00e5ff;
+    flex-shrink: 0;
+    z-index: 2;
+    position: relative;
+  }
+
+  .net-connector {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(to right, rgba(0,229,255,0.6), rgba(0,229,255,0.2));
+    flex-shrink: 0;
+  }
+  .net-unit:nth-child(even) .net-connector {
+    background: linear-gradient(to left, rgba(0,229,255,0.6), rgba(0,229,255,0.2));
+  }
+
+  .net-card {
+    flex: 1;
+    max-width: calc(50% - 63px);
+    background: rgba(0,180,216,0.05);
+    border: 1px solid rgba(0,180,216,0.18);
+    border-radius: 10px;
+    padding: 16px 20px;
+    transition: border-color 0.2s, box-shadow 0.25s, transform 0.25s;
+  }
+  .net-card:hover {
+    border-color: rgba(0,229,255,0.4);
+    box-shadow: 0 8px 24px rgba(0,229,255,0.1);
+    transform: translateY(-2px);
+  }
+  .net-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: #ffffff; }
+  .net-card p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; }
+
+  @media (max-width: 640px) {
+    .network-spine { display: none; }
+    .net-unit { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .net-spacer { display: none; }
+    .net-connector { display: none; }
+    .net-card { max-width: 100%; }
+  }
+
+  /* ── AUDIENCE — green tint ── */
+  .audience-section {
+    padding: 100px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .audience-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,200,150,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .audience-section .section-label { color: #00e5ff; }
+
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    perspective: 1200px;
+  }
+  @media (max-width: 640px) { .audience-grid { grid-template-columns: 1fr; } }
+
+  .audience-card {
+    background: rgba(0,40,25,0.4);
+    border: 1px solid rgba(0,200,150,0.18);
+    border-radius: 12px;
+    padding: 32px;
+    transition: transform 0.35s ease, border-color 0.2s, box-shadow 0.35s;
+    transform-style: preserve-3d;
+  }
+  .audience-card:hover {
+    border-color: rgba(0,200,150,0.4);
+    transform: rotateX(4deg) rotateY(3deg) translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,200,150,0.1);
+  }
+  .audience-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: #00e5ff; }
+
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .check-list li { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text); }
+  .check-list li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+
+  /* ── PRICING ── */
+  .pricing-section {
+    padding: 100px 40px;
+    background: linear-gradient(135deg, #050d18 0%, #071520 100%);
+    position: relative;
+  }
+  .pricing-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,229,255,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .pricing-card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid rgba(0,229,255,0.28);
+    border-radius: 16px;
+    padding: 48px 40px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(0,229,255,0.07), 0 0 160px rgba(0,229,255,0.04);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s;
+  }
+  .pricing-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 120px rgba(0,229,255,0.14), 0 32px 64px rgba(0,0,0,0.3);
+  }
+
+  .price-badge {
+    display: inline-block;
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.2);
+    color: var(--green);
+    font-size: 0.8rem;
+    padding: 4px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 3.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+    text-shadow: 0 0 30px rgba(0,229,255,0.4);
+  }
+  .price-note { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 32px; }
+
+  .price-includes {
+    list-style: none;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .price-includes li { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text); }
+  .price-includes li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+  .pricing-card .btn-primary { width: 100%; font-size: 1.1rem; padding: 16px; margin-bottom: 16px; }
+  .guarantee { font-size: 0.8rem; color: var(--text-dim); }
+
+  /* ── FAQ — purple tint ── */
+  .faq-section {
+    padding: 100px 40px;
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .faq-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top, rgba(123,47,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .faq-list { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+
+  .faq-item {
+    border: 1px solid rgba(123,47,255,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .faq-item:hover { border-color: rgba(123,47,255,0.45); }
+
+  .faq-q {
+    width: 100%;
+    background: rgba(123,47,255,0.05);
+    border: none;
+    padding: 20px 24px;
+    text-align: right;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .faq-q:hover { background: rgba(123,47,255,0.09); }
+  .faq-arrow { color: #00e5ff; font-size: 0.75rem; transition: transform 0.2s; flex-shrink: 0; }
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
+  .faq-a {
+    display: none;
+    padding: 0 24px 20px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    background: rgba(123,47,255,0.04);
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  footer .logo { font-size: 1rem; }
+  footer p { font-size: 0.8rem; color: var(--text-dim); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .skills-section, .audience-section, .faq-section { padding: 70px 20px; }
+    .units-section, .pricing-section { padding: 70px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { gap: 24px; }
+    footer { padding: 24px 20px; flex-direction: column; text-align: center; }
+    .pricing-card { padding: 36px 24px; }
+    .terminal-anim { width: 280px; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="network-canvas"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <img src="assets/zschool-logo.png?v=2" alt="Z-School" class="nav-logo">
+    Cyber<span>Path</span>
+  </a>
+  <a href="#pricing" class="btn-nav">לרכישה — 199 ₪</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="terminal-anim">
+    <span class="t-line" id="tl1"></span>
+    <span class="t-line" id="tl2"></span>
+    <span class="t-line" id="tl3"></span>
+    <span class="cursor" id="cursor"></span>
+  </div>
+
+  <h1>
+    רוצים להפוך ל<span class="highlight">מומחי סייבר</span>?
+  </h1>
+
+  <p class="sub">
+    בקורס הדיגיטלי מבית Z-School תלמדו איך רשתות מחשבים עובדות,
+    איך מגנים עליהן ואיך חושבים "כמו האקר".
+  </p>
+
+  <div class="hero-video">
+    <iframe src="https://app.heygen.com/embeds/b5800fc2aefb4d72b302443072e3f82e" title="HeyGen video player" frameborder="0" allow="encrypted-media; fullscreen;" allowfullscreen></iframe>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#pricing" class="btn-primary">לרכישת הקורס ב-199 ₪ בלבד</a>
+    <a href="#units" class="btn-secondary">מה לומדים פה</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">8</span>
+      <span class="stat-label">יחידות לימוד</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">13–18</span>
+      <span class="stat-label">גיל מתאים</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">0</span>
+      <span class="stat-label">ידע קודם נדרש</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">גישה לתמיד</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section class="skills-section">
+  <div class="section-header">
+    <h2>כישורים שיישארו לכל החיים</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <img src="assets/icons/skills/network-map.svg" class="skill-icon-svg" alt="מיפוי רשתות">
+      <h3>מיפוי רשתות</h3>
+      <p>להבין איך מחשבים מתקשרים ברשת, ואיך לזהות מה קיים במערכת.</p>
+    </div>
+    <div class="skill-card">
+      <img src="assets/icons/skills/port-door.svg" class="skill-icon-svg" alt="פורטים ושירותים">
+      <h3>פורטים ושירותים</h3>
+      <p>מה הם פורטים, למה הם חשובים, ואיך מזהים נקודות תורפה.</p>
+    </div>
+    <div class="skill-card">
+      <img src="assets/icons/skills/shield-circuit.svg" class="skill-icon-svg" alt="חשיבת הגנה">
+      <h3>חשיבת הגנה</h3>
+      <p>להבין את הצד ההתקפי כדי לבנות הגנה יעילה — כמו מקצוענים.</p>
+    </div>
+    <div class="skill-card">
+      <img src="assets/icons/skills/terminal-tool.svg" class="skill-icon-svg" alt="כלי סייבר אמיתיים">
+      <h3>כלי סייבר אמיתיים</h3>
+      <p>עבודה עם Nmap, HTTP, ועוד — בסביבה בטוחה ומובנית.</p>
+    </div>
+    <div class="skill-card">
+      <img src="assets/icons/skills/magnify-data.svg" class="skill-icon-svg" alt="חשיבה אנליטית">
+      <h3>חשיבה אנליטית</h3>
+      <p>לשאול שאלות נכונות, לזהות דפוסים, ולהסיק מסקנות מנתונים.</p>
+    </div>
+    <div class="skill-card">
+      <img src="assets/icons/skills/user-spark.svg" class="skill-icon-svg" alt="עצמאות דיגיטלית">
+      <h3>עצמאות דיגיטלית</h3>
+      <p>הילד יצא מהקורס עם ביטחון — מבין טכנולוגיה, לא פוחד ממנה.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- UNITS -->
+<section class="units-section" id="units">
+  <div class="units-inner">
+    <div class="section-header">
+      <span class="section-label">// מבנה הקורס</span>
+      <h2>8 יחידות, כל אחת בנויה על הקודמת</h2>
+      <p>וידאו קצר · סימולטור טרמינל · תרגול עם פידבק מיידי</p>
+    </div>
+    <div class="network-path" dir="ltr">
+      <div class="network-spine"></div>
+
+      <!-- 01 — card right (RTL: start) -->
+      <div class="net-unit">
+        <div class="net-card" dir="rtl"><h3>ברוכים לעיר הדיגיטלית</h3><p>מה זו רשת מחשבים? כתובות IP, נתבים, ואיך מידע עובר בין מחשבים.</p></div>
+        <div class="net-connector"></div>
+        <div class="net-node">01</div>
+        <div class="net-spacer"></div>
+      </div>
+
+      <!-- 02 — card left -->
+      <div class="net-unit">
+        <div class="net-spacer"></div>
+        <div class="net-node">02</div>
+        <div class="net-connector"></div>
+        <div class="net-card" dir="rtl"><h3>מציאת שכנים ברשת</h3><p>סריקת רשת בסיסית — מה רואים, מה מוסתר, ואיך מזהים מכשירים.</p></div>
+      </div>
+
+      <!-- 03 — card right -->
+      <div class="net-unit">
+        <div class="net-card" dir="rtl"><h3>דלתות פתוחות וסגורות</h3><p>מה הם פורטים, המצבים האפשריים שלהם, ומה זה אומר מבחינת אבטחה.</p></div>
+        <div class="net-connector"></div>
+        <div class="net-node">03</div>
+        <div class="net-spacer"></div>
+      </div>
+
+      <!-- 04 — card left -->
+      <div class="net-unit">
+        <div class="net-spacer"></div>
+        <div class="net-node">04</div>
+        <div class="net-connector"></div>
+        <div class="net-card" dir="rtl"><h3>HTTP ו-curl — מתחת לפני השטח</h3><p>איך אתרים עובדים מאחורי הקלעים, ומה אפשר לגלות מבקשת רשת.</p></div>
+      </div>
+
+      <!-- 05 — card right -->
+      <div class="net-unit">
+        <div class="net-card" dir="rtl"><h3>ה-DNS — פנקס הכתובות של האינטרנט</h3><p>איך שמות דומיין מתורגמים לכתובות IP ומה ניתן ללמוד מזה.</p></div>
+        <div class="net-connector"></div>
+        <div class="net-node">05</div>
+        <div class="net-spacer"></div>
+      </div>
+
+      <!-- 06 — card left -->
+      <div class="net-unit">
+        <div class="net-spacer"></div>
+        <div class="net-node">06</div>
+        <div class="net-connector"></div>
+        <div class="net-card" dir="rtl"><h3>Firewall — השומר בשער</h3><p>מה עושה חומת אש, איך היא מוגדרת, ואיך עוקפים הגדרות שגויות.</p></div>
+      </div>
+
+      <!-- 07 — card right -->
+      <div class="net-unit">
+        <div class="net-card" dir="rtl"><h3>תרחישי תקיפה וניתוח</h3><p>לנתח תרחישים אמיתיים: מה קרה, מה פוספס, ואיך אפשר היה למנוע.</p></div>
+        <div class="net-connector"></div>
+        <div class="net-node">07</div>
+        <div class="net-spacer"></div>
+      </div>
+
+      <!-- 08 — card left -->
+      <div class="net-unit">
+        <div class="net-spacer"></div>
+        <div class="net-node">08</div>
+        <div class="net-connector"></div>
+        <div class="net-card" dir="rtl"><h3>לסכם ולהמשיך</h3><p>סיכום כלים, בוחן סיום, ומה השלב הבא בהתפתחות כמומחה סייבר.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHOM -->
+<section class="audience-section">
+  <div class="section-header">
+    <span class="section-label">// למי זה מתאים</span>
+    <h2>לא צריך שום ידע קודם</h2>
+  </div>
+  <div class="audience-grid">
+    <div class="audience-card">
+      <h3>מתאים לילד או ילדה שלך אם הם</h3>
+      <ul class="check-list">
+        <li>אוהבים מחשבים</li>
+        <li>סקרנים ואוהבים להבין</li>
+        <li>רוצים ללמוד</li>
+        <li>מעדיפים לעשות</li>
+      </ul>
+    </div>
+    <div class="audience-card">
+      <h3>📚 מה תקבלו כהורים</h3>
+      <ul class="check-list">
+        <li>תוכן מקצועי, בגובה הילד</li>
+        <li>קצב גמיש — כל יחידה עצמאית</li>
+        <li>סביבת למידה בטוחה ומפוקחת</li>
+        <li>כישורים שפותחים דלתות לעתיד</li>
+        <li>גישה לכל החיים — ללא מנוי</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-header">
+    <h2>השקעה חד פעמית</h2>
+  </div>
+  <div class="pricing-card">
+    <span class="price-badge">גישה מלאה · לתמיד</span>
+    <span class="price">199 ₪</span>
+    <p class="price-note">תשלום חד פעמי · אין חיובים נוספים</p>
+    <ul class="price-includes">
+      <li>8 יחידות לימוד מלאות</li>
+      <li>וידאו בכל יחידה</li>
+      <li>סימולטורי טרמינל אינטראקטיביים</li>
+      <li>תרגולים עם פידבק מיידי</li>
+      <li>בוחן סיום + אישור סיום</li>
+      <li>גישה לתמיד — כולל עדכונים עתידיים</li>
+    </ul>
+    <a href="https://mrng.to/jXtvMjad0q" class="btn-primary" id="buy-btn" target="_blank" rel="noopener">לרכישה ורישום →</a>
+    <p class="guarantee">🔒 תשלום מאובטח · ביטול תוך 7 ימים</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="section-header">
+    <span class="section-label">// שאלות נפוצות</span>
+    <h2>שאלות ותשובות</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        האם צריך ידע קודם בתכנות או סייבר?
+        <span class="faq-arrow">▼</span>
+      </button>
+      <div class="faq-a">לא. הקורס בנוי מאפס ומניח אפס ידע קודם. כל מושג מוסבר בצורה ברורה, עם מטפורות מהחיים, לפני שמתקדמים.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        כמה זמן לוקחת כל יחידה?
+        <span class="faq-arrow">▼</span>
+      </button>
+      <div class="faq-a">כל יחידה בנויה לכ-20–35 דקות של למידה אקטיבית — וידאו קצר + תרגול. ניתן לפצל לאורך מספר ימים.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        האם הגישה לקורס פגה בתאריך מסוים?
+        <span class="faq-arrow">▼</span>
+      </button>
+      <div class="faq-a">לא. התשלום הוא חד פעמי וכולל גישה לכל החיים — גם לעדכונים עתידיים שיתווספו לקורס.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        על איזה מכשיר ניתן ללמוד?
+        <span class="faq-arrow">▼</span>
+      </button>
+      <div class="faq-a">הקורס נגיש מכל דפדפן — מחשב, טאבלט, או נייד. לא צריך להתקין שום דבר.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        האם זה מתאים גם לבנות?
+        <span class="faq-arrow">▼</span>
+      </button>
+      <div class="faq-a">בהחלט. הקורס מתאים לכל נוער בגיל 13–18, ללא קשר לרקע או מגדר. אנחנו בונים דור הבא של אנשי הסייבר הישראלי.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="logo">Cyber<span>Path</span></a>
+  <p>קורס בפיתוח Z-School · shanis@z-school.co.il</p>
+  <p style="font-size:0.75rem; color:var(--text-dim);">© 2026 כל הזכויות שמורות</p>
+</footer>
+
+<script>
+  // ── Network animation ──
+  const canvas = document.getElementById('network-canvas');
+  const ctx = canvas.getContext('2d');
+  let nodes = [];
+  const NODE_COUNT = 55;
+  const MAX_DIST = 140;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function initNodes() {
+    nodes = [];
+    for (let i = 0; i < NODE_COUNT; i++) {
+      nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        r: Math.random() * 1.8 + 0.8
+      });
+    }
+  }
+
+  function drawNetwork() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const n of nodes) {
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MAX_DIST) {
+          const alpha = (1 - dist / MAX_DIST) * 0.45;
+          ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const n of nodes) {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,229,255,0.65)';
+      ctx.fill();
+    }
+    requestAnimationFrame(drawNetwork);
+  }
+
+  resize();
+  initNodes();
+  drawNetwork();
+  window.addEventListener('resize', () => { resize(); initNodes(); });
+
+  // ── Terminal animation ──
+  const termLines = [
+    '> nmap -sV 192.168.1.0/24',
+    '> 8 hosts discovered',
+    '> loading CyberPath... ✓'
+  ];
+
+  async function typeText(el, text, speed = 42) {
+    for (const ch of text) {
+      el.textContent += ch;
+      await new Promise(r => setTimeout(r, speed));
+    }
+  }
+
+  async function runTerminal() {
+    const els = [
+      document.getElementById('tl1'),
+      document.getElementById('tl2'),
+      document.getElementById('tl3')
+    ];
+    const cursor = document.getElementById('cursor');
+    await new Promise(r => setTimeout(r, 700));
+    for (let i = 0; i < termLines.length; i++) {
+      await typeText(els[i], termLines[i]);
+      await new Promise(r => setTimeout(r, 280));
+    }
+    cursor.style.display = 'none';
+  }
+
+  runTerminal();
+
+  // ── FAQ ──
+  function toggleFaq(btn) {
+    btn.closest('.faq-item').classList.toggle('open');
+  }
+
+  // ── Smooth scroll ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+</script>
+
+</body>
+</html>
