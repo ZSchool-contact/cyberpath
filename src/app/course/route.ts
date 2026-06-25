@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
       document.addEventListener('DOMContentLoaded', function() {
         var authScreen = document.getElementById('auth-screen');
         if (authScreen) authScreen.classList.remove('active');
+        var dashboardScreen = document.getElementById('dashboard-screen');
+        if (dashboardScreen) dashboardScreen.classList.add('active');
         localStorage.setItem('cp_current', 'clerk_user');
       });
     </script></body>`
