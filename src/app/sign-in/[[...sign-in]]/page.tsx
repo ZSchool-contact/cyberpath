@@ -14,6 +14,7 @@ export default function SignInPage() {
     }}>
       <Image src="/zschool-logo-dark.png" alt="Z-School" width={140} height={50} style={{ objectFit: "contain" }} />
       <SignIn
+        forceRedirectUrl="/course"
         appearance={{
           variables: {
             colorBackground: "#0a1628",
