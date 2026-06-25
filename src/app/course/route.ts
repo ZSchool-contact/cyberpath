@@ -41,6 +41,13 @@ export async function GET(request: NextRequest) {
         window.handleLogout = function() {
           window.location.href = '/sign-out';
         };
+        // Override openUnit to use new Next.js routes
+        window.openUnit = function(unit) {
+          var match = unit.file.match(/units\/(unit-\d+)\//);
+          if (match) {
+            window.location.href = '/units/' + match[1];
+          }
+        };
       });
     </script></body>`
   );
