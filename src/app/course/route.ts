@@ -19,6 +19,10 @@ export async function GET(request: NextRequest) {
   let html = fs.readFileSync(filePath, "utf-8");
   html = html.replaceAll("../../assets/", "/assets/");
   html = html.replaceAll("../assets/", "/assets/");
+  html = html.replace(
+    "function openUnit(unit) {\n  window.location.href = unit.file;\n}",
+    "function openUnit(unit) {\n  var match = unit.file.match(/units\\/(unit-\\d+)\\//); \n  if (match) window.location.href = '/units/' + match[1];\n}"
+  );
 
   html = html.replace(
     "</body>",
@@ -40,13 +44,6 @@ export async function GET(request: NextRequest) {
         // Override logout to use Clerk sign-out
         window.handleLogout = function() {
           window.location.href = '/sign-out';
-        };
-        // Override openUnit to use new Next.js routes
-        window.openUnit = function(unit) {
-          var match = unit.file.match(/units\/(unit-\d+)\//);
-          if (match) {
-            window.location.href = '/units/' + match[1];
-          }
         };
       });
     </script></body>`
