@@ -687,7 +687,13 @@ function navigate(dir){
 buildDots();
 updateNav();
 
-function toggleAnn(id){var el=document.getElementById(id);if(el)el.classList.toggle('show');}
+function toggleAnn(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var isOpen=el.classList.contains('show');
+  document.querySelectorAll('.ann-pop').forEach(function(p){p.classList.remove('show');});
+  if(!isOpen)el.classList.add('show');
+}
 function revealHookScan(){
   document.getElementById('hook-q').style.display='none';
   var rows=[

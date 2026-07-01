@@ -1005,18 +1005,16 @@
   function classify(idx, label, correct) {
     const row = document.getElementById('cls-' + idx);
     if (row.dataset.answered) return;
-    row.dataset.answered = '1';
-    classifyDone[idx] = true;
     const btn = [...row.querySelectorAll('.cls-btn')].find(b => b.textContent === label);
-    btn.classList.add(correct ? 'correct' : 'wrong');
     if (!correct) {
-      row.querySelectorAll('.cls-btn').forEach(b => { if (b.classList.contains('correct') || b.textContent !== label) {} });
-      const correctBtn = [...row.querySelectorAll('.cls-btn')].find(b => {
-        const map = ['LAN','WAN','PAN'];
-        return b.textContent === map[[true,true,true].indexOf(true)];
-      });
+      btn.classList.add('wrong');
+      setTimeout(() => btn.classList.remove('wrong'), 800);
+      return;
     }
+    row.dataset.answered = '1';
+    btn.classList.add('correct');
     row.querySelectorAll('.cls-btn').forEach(b => b.style.pointerEvents = 'none');
+    classifyDone[idx] = true;
     if (classifyDone.every(Boolean)) document.getElementById('classify-success').style.display = 'block';
   }
 
